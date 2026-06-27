@@ -146,7 +146,14 @@
             box-shadow: 0 0 15px #ffffff;
         }
 
-        /* Message Boxes output matching the glass layout */
+        /* Group Container for a main Thread Post + its Sub-replies */
+        .thread-group {
+            display: flex;
+            flex-direction: column;
+            margin-top: 12px;
+        }
+
+        /* Main OP Thread Box output matching the glass layout */
         .message-box {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(20px);
@@ -154,8 +161,32 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             padding: 20px;
-            margin-top: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Sub-replies styling looking explicitly distinct like image_de04be.png */
+        .reply-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 3px solid #3388ff; /* Visual marker link anchor accent */
+            border-radius: 0 12px 12px 12px;
+            padding: 15px 20px;
+            margin-top: 8px;
+            margin-left: 30px; /* Distinctly indented layout offset */
+            max-width: calc(100% - 30px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        /* Subtle textboard reply arrow pointer symbol tracking left boundary margin */
+        .reply-box::before {
+            content: ">>";
+            position: absolute;
+            left: -22px;
+            top: 14px;
+            color: rgba(255, 255, 255, 0.15);
+            font-weight: bold;
+            font-size: 0.85rem;
         }
         
         .meta { 
@@ -271,9 +302,7 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
 
-            // Process post reply strings (e.g., >>1)
             safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
-
             safeHtml = safeHtml.replace(/^#\s*(.*?)$/gm, '<span class="mk-large">$1</span>');
             safeHtml = safeHtml.replace(/^&gt;(.*?)$/gm, '<span class="mk-green">&gt;$1</span>');
             safeHtml = safeHtml.replace(/^&lt;(.*?)$/gm, '<span class="mk-orange">&lt;$1</span>');
@@ -282,16 +311,12 @@
             safeHtml = safeHtml.replace(/-(.*?)-/g, '<span class="mk-strike">$1</span>');
             safeHtml = safeHtml.replace(/_(.*?)_/g, '<span class="mk-underline">$1</span>');
             safeHtml = safeHtml.replace(/%(.*?)%/g, '<span class="mk-glow">$1</span>');
-            
-            // Fixed: Completely strip the structural nested parentheses symbols for blue text rule
             safeHtml = safeHtml.replace(/\(\(\((.*?)\)\)\)/g, '<span class="mk-blue-font">$1</span>');
-            
             safeHtml = safeHtml.replace(/\|(.*?)\|/g, '<span class="mk-spoiler">$1</span>');
 
             return safeHtml;
         }
 
-        // Inserts reply marker into textarea when a post ID index label is clicked
         window.insertReplyTag = function(num) {
             messageInput.value += `>>${num} `;
             messageInput.focus();
@@ -309,50 +334,103 @@
 
                 board.innerHTML = '';
                 
-                // Track item index indices relative to chronological sorting stack
-                data.forEach((entry, idx) => {
-                    const postNum = data.length - idx; 
+                // Chronological index tracking wrapper (oldest = No.1)
+                const totalPosts = data.length;
+                const indexedEntries = [...data].reverse().map((entry, idx) => ({
+                    ...entry,
+                    postNum: idx + 1
+                }));
 
-                    const dateStr = new Date(entry.timestamp).toLocaleString('en-US', {
-                        year: 'numeric', month: '2-digit', day: '2-digit',
-                        hour: '2-digit', minute: '2-digit', second: '2-digit',
-                        hour12: false
+                // Thread tree assembly structures
+                const mainThreads = [];
+                const repliesMap = {};
+
+                // Map target references and pull threads apart dynamically
+                indexedEntries.forEach(entry => {
+                    const match = entry.message.match(/>>(\d+)/);
+                    const parentId = match ? parseInt(match[1], 10) : null;
+
+                    // Verify the targeted parent number exists on the board, otherwise count as OP
+                    if (parentId && parentId < entry.postNum && indexedEntries.some(e => e.postNum === parentId)) {
+                        if (!repliesMap[parentId]) repliesMap[parentId] = [];
+                        repliesMap[parentId].push(entry);
+                    } else {
+                        mainThreads.push(entry);
+                    }
+                });
+
+                // Thread bumping calculation structure
+                mainThreads.forEach(thread => {
+                    const threadReplies = repliesMap[thread.postNum] || [];
+                    if (threadReplies.length > 0) {
+                        // The bump time becomes the timestamp of its newest reply item
+                        thread.lastBumpTime = Math.max(...threadReplies.map(r => new Date(r.timestamp).getTime()));
+                    } else {
+                        thread.lastBumpTime = new Date(thread.timestamp).getTime();
+                    }
+                });
+
+                // Sort threads by latest bump time down to oldest
+                mainThreads.sort((a, b) => b.lastBumpTime - a.lastBumpTime);
+
+                // Render compiled structure sets
+                mainThreads.forEach(thread => {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'thread-group';
+
+                    // 1. Render primary thread item (OP Box)
+                    groupDiv.appendChild(createPostElement(thread, 'message-box'));
+
+                    // 2. Nest sub-replies directly underneath, matching image_de04be.png reference layout
+                    const threadReplies = repliesMap[thread.postNum] || [];
+                    threadReplies.forEach(reply => {
+                        groupDiv.appendChild(createPostElement(reply, 'reply-box'));
                     });
 
-                    const box = document.createElement('div');
-                    box.className = 'message-box';
-                    
-                    const metaDiv = document.createElement('div');
-                    metaDiv.className = 'meta';
-                    
-                    const metaText = document.createTextNode(`[${dateStr}] Anonymous: ${entry.username} `);
-                    metaDiv.appendChild(metaText);
-
-                    if (entry.tripcode && entry.tripcode !== "None") {
-                        const tripSpan = document.createElement('span');
-                        tripSpan.className = 'tripcode';
-                        tripSpan.textContent = entry.tripcode;
-                        metaDiv.appendChild(tripSpan);
-                    }
-
-                    // Add unique numerical identity label linking back into structural text engine
-                    const idLink = document.createElement('a');
-                    idLink.className = 'post-id-link';
-                    idLink.textContent = ` No.${postNum}`;
-                    idLink.setAttribute('onclick', `insertReplyTag(${postNum})`);
-                    metaDiv.appendChild(idLink);
-
-                    const textDiv = document.createElement('div');
-                    textDiv.className = 'text-content';
-                    textDiv.innerHTML = parseTextboardMarkup(entry.message);
-
-                    box.appendChild(metaDiv);
-                    box.appendChild(textDiv);
-                    board.appendChild(box);
+                    board.appendChild(groupDiv);
                 });
+
             } catch (err) {
                 board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>ERROR: heckin error in the mainframe...</div>";
             }
+        }
+
+        function createPostElement(entry, className) {
+            const dateStr = new Date(entry.timestamp).toLocaleString('en-US', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false
+            });
+
+            const box = document.createElement('div');
+            box.className = className;
+            
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'meta';
+            
+            const metaText = document.createTextNode(`[${dateStr}] Anonymous: ${entry.username} `);
+            metaDiv.appendChild(metaText);
+
+            if (entry.tripcode && entry.tripcode !== "None") {
+                const tripSpan = document.createElement('span');
+                tripSpan.className = 'tripcode';
+                tripSpan.textContent = entry.tripcode;
+                metaDiv.appendChild(tripSpan);
+            }
+
+            const idLink = document.createElement('a');
+            idLink.className = 'post-id-link';
+            idLink.textContent = ` No.${entry.postNum}`;
+            idLink.setAttribute('onclick', `insertReplyTag(${entry.postNum})`);
+            metaDiv.appendChild(idLink);
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text-content';
+            textDiv.innerHTML = parseTextboardMarkup(entry.message);
+
+            box.appendChild(metaDiv);
+            box.appendChild(textDiv);
+            return box;
         }
 
         form.addEventListener('submit', async (e) => {
@@ -368,7 +446,6 @@
                 });
 
                 if (response.ok) {
-                    // Only clears the message container text block, leaving chosen credentials intact
                     messageInput.value = '';
                     fetchMessages();
                 } else {
