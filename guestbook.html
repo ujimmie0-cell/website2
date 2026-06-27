@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vanitas | Guestbook</title>
+    <!-- FontAwesome for UI Elements -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --glow-color: rgba(255, 255, 255, 0.4);
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.4);
+            --accent-glow: #00ff00;
+        }
+
+        /* Custom font declaration for blue text rule */
+        @font-face {
+            font-family: 'TestFont1';
+            src: url('test/font1.ttf') format('truetype');
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background: #000000;
+            color: var(--text-main);
+            font-family: Courier, monospace, sans-serif;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .board-container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top thread prompt block styled like the terminal panel panels */
+        .thread-prompt {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .thread-prompt .guestbook-header {
+            font-size: 1.4rem;
+            letter-spacing: 4px;
+            text-transform: lowercase;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .thread-prompt a {
+            color: var(--text-sub);
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: text-shadow 0.2s, color 0.2s;
+        }
+        
+        .thread-prompt a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        /* Main rules card redone in dark glassmorphism */
+        .rules-card {
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+        
+        .rules-card h3 {
+            text-align: center;
+            margin: 0 0 16px 0;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-main);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+        
+        .rules-card ol { 
+            margin: 0; 
+            padding-left: 20px; 
+        }
+        
+        .rules-card li {
+            margin-bottom: 6px;
+        }
+
+        /* Input Form styling integrated with landing page button assets */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        
+        form input, form textarea {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 14px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        
+        form input:focus, form textarea:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+            outline: none;
+        }
+        
+        form button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 14px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+        }
+        
+        form button:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        /* Message Boxes output matching the glass layout */
+        .message-box {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .meta { 
+            color: var(--text-sub); 
+            font-size: 0.8rem; 
+            margin-bottom: 12px; 
+            letter-spacing: 0.5px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+        }
+        
+        .tripcode { 
+            color: #ff0055; 
+            font-weight: bold; 
+            text-shadow: 0 0 6px rgba(255, 0, 85, 0.3);
+        }
+        
+        .text-content { 
+            word-break: break-word; 
+            line-height: 1.6; 
+            white-space: pre-wrap; 
+            font-size: 0.95rem;
+        }
+
+        /* --- Custom Markup CSS Classes --- */
+        .mk-large { font-size: 1.3rem; font-weight: bold; display: block; margin: 6px 0; color: #ffffff; }
+        .mk-green { color: #789922; }
+        .mk-orange { color: #ff8800; }
+        .mk-bold { font-weight: bold; color: #ffffff; }
+        .mk-italic { font-style: italic; }
+        .mk-strike { text-decoration: line-through; opacity: 0.6; }
+        .mk-underline { text-decoration: underline; }
+        .mk-glow {
+            color: #000000 !important;
+            background-color: #000000;
+            text-shadow: 0 0 4px var(--accent-glow), 0 0 8px var(--accent-glow), 0 0 12px var(--accent-glow);
+            padding: 2px 4px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .mk-blue-font { font-family: 'TestFont1', sans-serif; color: #3388ff; }
+        .mk-spoiler {
+            filter: blur(5px);
+            background: rgba(255, 255, 255, 0.05);
+            color: transparent;
+            cursor: pointer;
+            transition: filter 0.3s ease, color 0.3s ease, background 0.3s ease;
+            padding: 0 4px;
+            border-radius: 3px;
+        }
+        .mk-spoiler:hover {
+            filter: blur(0);
+            color: inherit;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="board-container">
+
+        <!-- Header Block Layout -->
+        <div class="thread-prompt">
+            <div class="guestbook-header">guestbook</div>
+            <a href="#">[Start a New Thread]</a>
+        </div>
+
+        <!-- Rules Info Block -->
+        <div class="rules-card">
+            <h3>Rules</h3>
+            <ol>
+                <li>No 'p.</li>
+                <li>No gore.</li>
+                <li>No spamming.</li>
+                <li>Don't be retarded.</li>
+            </ol>
+        </div>
+
+        <!-- Post Submission Input -->
+        <form id="guestbookForm">
+            <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
+            <textarea id="message" placeholder="Markup styles active..." rows="5" required maxlength="700"></textarea>
+            <button type="submit">SUBMIT NEW POST</button>
+        </form>
+
+        <!-- Target Destination Container for Posts -->
+        <div id="boardEntries">Mapping database links...</div>
+
+    </div>
+
+    <script>
+        const API_URL = 'https://guestbook-api.32d23d2r435ged.workers.dev'; 
+
+        const form = document.getElementById('guestbookForm');
+        const board = document.getElementById('boardEntries');
+
+        function parseTextboardMarkup(rawText) {
+            let safeHtml = rawText
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+            safeHtml = safeHtml.replace(/^#\s*(.*?)$/gm, '<span class="mk-large">$1</span>');
+            safeHtml = safeHtml.replace(/^&gt;(.*?)$/gm, '<span class="mk-green">&gt;$1</span>');
+            safeHtml = safeHtml.replace(/^&lt;(.*?)$/gm, '<span class="mk-orange">&lt;$1</span>');
+            safeHtml = safeHtml.replace(/\*\*(.*?)\*\*/g, '<span class="mk-bold">$1</span>');
+            safeHtml = safeHtml.replace(/\*(.*?)\*/g, '<span class="mk-italic">$1</span>');
+            safeHtml = safeHtml.replace(/-(.*?)-/g, '<span class="mk-strike">$1</span>');
+            safeHtml = safeHtml.replace(/_(.*?)_/g, '<span class="mk-underline">$1</span>');
+            safeHtml = safeHtml.replace(/%(.*?)%/g, '<span class="mk-glow">$1</span>');
+            safeHtml = safeHtml.replace(/\(\(\((.*?)\)\)\)/g, '(((<span class="mk-blue-font">$1</span>)))');
+            safeHtml = safeHtml.replace(/\|(.*?)\|/g, '<span class="mk-spoiler">$1</span>');
+
+            return safeHtml;
+        }
+
+        async function fetchMessages() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>The network remains vacant.</div>";
+                    return;
+                }
+
+                board.innerHTML = '';
+                data.forEach(entry => {
+                    const dateStr = new Date(entry.timestamp).toLocaleString('en-US', {
+                        year: 'numeric', month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit',
+                        hour12: false
+                    });
+
+                    const box = document.createElement('div');
+                    box.className = 'message-box';
+                    
+                    const metaDiv = document.createElement('div');
+                    metaDiv.className = 'meta';
+                    
+                    const metaText = document.createTextNode(`[${dateStr}] Anonymous: ${entry.username} `);
+                    metaDiv.appendChild(metaText);
+
+                    if (entry.tripcode && entry.tripcode !== "None") {
+                        const tripSpan = document.createElement('span');
+                        tripSpan.className = 'tripcode';
+                        tripSpan.textContent = entry.tripcode;
+                        metaDiv.appendChild(tripSpan);
+                    }
+
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'text-content';
+                    textDiv.innerHTML = parseTextboardMarkup(entry.message);
+
+                    box.appendChild(metaDiv);
+                    box.appendChild(textDiv);
+                    board.appendChild(box);
+                });
+            } catch (err) {
+                board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>ERROR: heckin error in the mainframe...</div>";
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const message = document.getElementById('message').value;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, message })
+                });
+
+                if (response.ok) {
+                    form.reset();
+                    fetchMessages();
+                } else {
+                    alert("Transmission rejected.");
+                }
+            } catch (err) {
+                alert("Synchronization interrupted.");
+            }
+        });
+
+        fetchMessages();
+    </script>
+</body>
+</html>
