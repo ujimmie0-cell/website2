@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>vanitas | Guestbook</title>
-    <!-- FontAwesome for UI Elements -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -64,22 +63,6 @@
             letter-spacing: 4px;
             text-transform: lowercase;
             color: var(--text-main);
-            margin-bottom: 10px;
-        }
-
-        .thread-prompt a {
-            color: var(--text-sub);
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: text-shadow 0.2s, color 0.2s;
-        }
-        
-        .thread-prompt a:hover {
-            color: #ffffff;
-            text-shadow: 0 0 10px var(--glow-color);
         }
 
         /* Main rules card redone in dark glassmorphism */
@@ -183,6 +166,22 @@
             border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
             padding-bottom: 8px;
         }
+
+        .post-id-link {
+            color: #3388ff;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+        .post-id-link:hover {
+            text-shadow: 0 0 5px rgba(51, 136, 255, 0.6);
+        }
+
+        .reply-tag {
+            color: #3388ff;
+            font-weight: bold;
+        }
         
         .tripcode { 
             color: #ff0055; 
@@ -234,31 +233,25 @@
 
     <div class="board-container">
 
-        <!-- Header Block Layout -->
         <div class="thread-prompt">
             <div class="guestbook-header">guestbook</div>
-            <a href="#">[Start a New Thread]</a>
         </div>
 
-        <!-- Rules Info Block -->
         <div class="rules-card">
             <h3>Rules</h3>
             <ol>
                 <li>No 'p.</li>
                 <li>No gore.</li>
                 <li>No spamming.</li>
-                <li>Don't be retarded.</li>
             </ol>
         </div>
 
-        <!-- Post Submission Input -->
         <form id="guestbookForm">
             <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
             <textarea id="message" placeholder="Markup styles active..." rows="5" required maxlength="700"></textarea>
             <button type="submit">SUBMIT NEW POST</button>
         </form>
 
-        <!-- Target Destination Container for Posts -->
         <div id="boardEntries">Mapping database links...</div>
 
     </div>
@@ -268,6 +261,7 @@
 
         const form = document.getElementById('guestbookForm');
         const board = document.getElementById('boardEntries');
+        const messageInput = document.getElementById('message');
 
         function parseTextboardMarkup(rawText) {
             let safeHtml = rawText
@@ -277,6 +271,9 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
 
+            // Process post reply strings (e.g., >>1)
+            safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
+
             safeHtml = safeHtml.replace(/^#\s*(.*?)$/gm, '<span class="mk-large">$1</span>');
             safeHtml = safeHtml.replace(/^&gt;(.*?)$/gm, '<span class="mk-green">&gt;$1</span>');
             safeHtml = safeHtml.replace(/^&lt;(.*?)$/gm, '<span class="mk-orange">&lt;$1</span>');
@@ -285,11 +282,20 @@
             safeHtml = safeHtml.replace(/-(.*?)-/g, '<span class="mk-strike">$1</span>');
             safeHtml = safeHtml.replace(/_(.*?)_/g, '<span class="mk-underline">$1</span>');
             safeHtml = safeHtml.replace(/%(.*?)%/g, '<span class="mk-glow">$1</span>');
-            safeHtml = safeHtml.replace(/\(\(\((.*?)\)\)\)/g, '(((<span class="mk-blue-font">$1</span>)))');
+            
+            // Fixed: Completely strip the structural nested parentheses symbols for blue text rule
+            safeHtml = safeHtml.replace(/\(\(\((.*?)\)\)\)/g, '<span class="mk-blue-font">$1</span>');
+            
             safeHtml = safeHtml.replace(/\|(.*?)\|/g, '<span class="mk-spoiler">$1</span>');
 
             return safeHtml;
         }
+
+        // Inserts reply marker into textarea when a post ID index label is clicked
+        window.insertReplyTag = function(num) {
+            messageInput.value += `>>${num} `;
+            messageInput.focus();
+        };
 
         async function fetchMessages() {
             try {
@@ -302,7 +308,11 @@
                 }
 
                 board.innerHTML = '';
-                data.forEach(entry => {
+                
+                // Track item index indices relative to chronological sorting stack
+                data.forEach((entry, idx) => {
+                    const postNum = data.length - idx; 
+
                     const dateStr = new Date(entry.timestamp).toLocaleString('en-US', {
                         year: 'numeric', month: '2-digit', day: '2-digit',
                         hour: '2-digit', minute: '2-digit', second: '2-digit',
@@ -325,6 +335,13 @@
                         metaDiv.appendChild(tripSpan);
                     }
 
+                    // Add unique numerical identity label linking back into structural text engine
+                    const idLink = document.createElement('a');
+                    idLink.className = 'post-id-link';
+                    idLink.textContent = ` No.${postNum}`;
+                    idLink.setAttribute('onclick', `insertReplyTag(${postNum})`);
+                    metaDiv.appendChild(idLink);
+
                     const textDiv = document.createElement('div');
                     textDiv.className = 'text-content';
                     textDiv.innerHTML = parseTextboardMarkup(entry.message);
@@ -341,7 +358,7 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
-            const message = document.getElementById('message').value;
+            const message = messageInput.value;
 
             try {
                 const response = await fetch(API_URL, {
@@ -351,7 +368,8 @@
                 });
 
                 if (response.ok) {
-                    form.reset();
+                    // Only clears the message container text block, leaving chosen credentials intact
+                    messageInput.value = '';
                     fetchMessages();
                 } else {
                     alert("Transmission rejected.");
