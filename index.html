@@ -844,60 +844,56 @@ window.fetchMessages = async function() {
             return;
         }
 
-        // Map everything out by ID or Timestamp for parent-child tracking
         const postMap = {};
         const topLevelThreads = [];
-        const allReplies = [];
 
-        // Distribute posts into top-level threads vs replies
+        // Step 1: Map all posts by their unique signature identifiers
         data.forEach(post => {
             post.replies = [];
             const uniqueId = post.id || post.timestamp;
             postMap[uniqueId] = post;
-
+            
             if (!post.parentId) {
                 topLevelThreads.push(post);
-            } else {
-                allReplies.push(post);
             }
         });
 
-        // Attach replies to their root-level threads
-        allReplies.forEach(reply => {
-            // Find the ultimate root thread by tracing up parent links
-            let currentParent = postMap[reply.parentId];
-            while (currentParent && currentParent.parentId) {
-                currentParent = postMap[currentParent.parentId];
-            }
-
-            if (currentParent) {
-                currentParent.replies.push(reply);
-            } else {
-                // Fallback: If parent thread is missing, treat as a top-level thread
-                topLevelThreads.push(reply);
+        // Step 2: Build parent/child trees for rendering paths
+        data.forEach(post => {
+            if (post.parentId && postMap[post.parentId]) {
+                postMap[post.parentId].replies.push(post);
             }
         });
 
-        // Clear board container
         board.innerHTML = '';
 
-        // Render each thread group
+        // Step 3: Use a controlled recursive tree walker
+        function renderPost(post, isOpPost, container) {
+            // Main thread threads get full-width 'message-box'
+            // ANY nested reply (direct or sub-reply) gets 'reply-box' (40px indentation)
+            const className = isOpPost ? 'message-box' : 'reply-box';
+            container.appendChild(createPostElement(post, className, isOpPost));
+
+            if (post.replies.length > 0) {
+                // Sort child entries chronologically oldest-to-newest
+                post.replies.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                
+                post.replies.forEach(childReply => {
+                    // Pass the SAME container element down! 
+                    // This forces the sub-replies out into the parent column, preventing extra margins.
+                    renderPost(childReply, false, container);
+                });
+            }
+        }
+
+        // Loop execution entry point
         topLevelThreads.forEach(thread => {
             const groupDiv = document.createElement('div');
             groupDiv.className = 'thread-group';
             
-            // 1. Render the main Original Post (OP) at full width
-            groupDiv.appendChild(createPostElement(thread, 'message-box', true));
-
-            // 2. Sort all associated thread replies chronologically (oldest to newest)
-            thread.replies.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-            // 3. Render every single reply using the standard '.reply-box' structure
-            // This guarantees they all get identical flat indentation (margin-left: 40px)
-            thread.replies.forEach(reply => {
-                groupDiv.appendChild(createPostElement(reply, 'reply-box', false));
-            });
-
+            // Render the thread group completely inside its isolated wrapper
+            renderPost(thread, true, groupDiv);
+            
             board.appendChild(groupDiv);
         });
 
