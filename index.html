@@ -91,21 +91,29 @@
             padding-left: 18px; 
         }
 
-        /* Imageboard Style Form Post Box Layout - Rounded */
+        /* Form Post Box Layout - Fixed Layout */
         .form-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
             margin-bottom: 10px;
+            gap: 12px;
         }
 
         form {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .inputs-table {
             display: table;
             border-collapse: separate;
             border-spacing: 0;
             width: 100%;
-            max-width: 500px;
             background: rgba(255, 255, 255, 0.01);
             border: 1px solid var(--board-border);
             border-radius: var(--card-radius);
@@ -120,7 +128,6 @@
             display: table-cell;
             background: var(--form-label-bg);
             border-right: 1px solid var(--board-border);
-            border-bottom: 1px solid var(--board-border);
             padding: 8px;
             font-size: 0.8rem;
             font-weight: bold;
@@ -129,9 +136,13 @@
             vertical-align: middle;
         }
 
+        .form-row:first-child .form-label, 
+        .form-row:first-child .form-input-cell {
+            border-bottom: 1px solid var(--board-border);
+        }
+
         .form-input-cell {
             display: table-cell;
-            border-bottom: 1px solid var(--board-border);
             padding: 4px;
             position: relative;
         }
@@ -159,32 +170,20 @@
             right: 12px;
             bottom: 10px;
         }
-        
-        .submit-row {
-            display: table-row;
-        }
-
-        .submit-row .form-label {
-            border-bottom: none;
-        }
-
-        .submit-cell {
-            display: table-cell;
-            text-align: center;
-            padding: 6px;
-            background: rgba(255, 255, 255, 0.005);
-        }
 
         form button {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--board-border);
             border-radius: 4px;
             color: var(--text-main);
-            padding: 6px 16px;
+            padding: 8px 24px;
             font-family: inherit;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             cursor: pointer;
             font-weight: bold;
+            margin-top: 4px;
+            width: auto;
+            min-width: 120px;
         }
         
         form button:hover:not(:disabled) {
@@ -223,7 +222,6 @@
             margin-top: 10px;
         }
 
-        /* OPs (Messages) now have their own independent background card style */
         .message-box {
             background: var(--msg-bg);
             border: 1px solid var(--board-border);
@@ -233,7 +231,6 @@
             margin-bottom: 6px;
         }
 
-        /* Replies have their own independent card style */
         .reply-box {
             background: var(--reply-bg);
             border: 1px solid var(--board-border);
@@ -246,7 +243,6 @@
             position: relative;
         }
 
-        /* Thread guide link arrows */
         .reply-box::before {
             content: ">>";
             position: absolute;
@@ -272,9 +268,10 @@
         }
 
         .post-id-link {
-            color: var(--text-sub);
+            color: #190080;
             text-decoration: none;
             cursor: pointer;
+            font-weight: bold;
         }
         .post-id-link:hover {
             color: #ffaa00;
@@ -286,7 +283,7 @@
         }
         
         .tripcode { 
-            color: #ff0055; 
+            color: #6a0005; 
             font-weight: bold; 
         }
         
@@ -309,7 +306,7 @@
             border: none;
             color: var(--text-sub);
             font-family: inherit;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             cursor: pointer;
             padding: 2px 4px;
             transition: color 0.1s;
@@ -331,7 +328,7 @@
             color: #ffaa00;
         }
 
-        /* Pagination Module UI */
+        /* Pagination Module UI - Muted White Links */
         .pagination-container {
             display: flex;
             justify-content: center;
@@ -348,7 +345,7 @@
         .pag-btn {
             background: transparent;
             border: none;
-            color: #ffaa00;
+            color: var(--text-main);
             cursor: pointer;
             font-family: inherit;
             padding: 2px 6px;
@@ -359,7 +356,7 @@
         .pag-btn:disabled {
             color: var(--text-sub);
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.3;
         }
 
         /* --- Markup Style Configurations --- */
@@ -413,7 +410,7 @@
     <div class="board-container">
 
         <div class="thread-prompt">
-            <div class="guestbook-header">/vanitas/ - Guestbook</div>
+            <div class="guestbook-header">/guestbook/</div>
         </div>
 
         <div class="rules-card">
@@ -427,25 +424,22 @@
 
         <div class="form-wrapper">
             <form id="guestbookForm">
-                <div class="form-row">
-                    <div class="form-label">Name</div>
-                    <div class="form-input-cell">
-                        <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
+                <div class="inputs-table">
+                    <div class="form-row">
+                        <div class="form-label">Name</div>
+                        <div class="form-input-cell">
+                            <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">Comment</div>
+                        <div class="form-input-cell">
+                            <textarea id="message" placeholder="Put your text here." rows="4" required maxlength="700"></textarea>
+                            <div class="char-counter" id="charCount">0 / 700</div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-label">Comment</div>
-                    <div class="form-input-cell">
-                        <textarea id="message" placeholder="Put your text here." rows="4" required maxlength="700"></textarea>
-                        <div class="char-counter" id="charCount">0 / 700</div>
-                    </div>
-                </div>
-                <div class="submit-row">
-                    <div class="form-label">Submit</div>
-                    <div class="submit-cell">
-                        <button type="submit" id="submitBtn">Submit</button>
-                    </div>
-                </div>
+                <button type="submit" id="submitBtn">Submit</button>
             </form>
         </div>
 
@@ -540,12 +534,12 @@
                     localStorage.setItem(`clapped_${timestamp}`, "true");
                     const targetBtn = document.getElementById(btnId);
                     if (targetBtn) {
-                        const currentCount = parseInt(targetBtn.textContent.replace('👏 ', ''), 10) || 0;
-                        targetBtn.textContent = `👏 ${currentCount + 1}`;
+                        const currentCount = parseInt(targetBtn.textContent.replace('▲ ', ''), 10) || 0;
+                        targetBtn.textContent = `▲ ${currentCount + 1}`;
                     }
                 }
             } catch (err) {
-                console.error("Clap synchronization failed.");
+                console.error("Upvote processing fault.");
             }
         };
 
@@ -725,7 +719,7 @@
             const clapButton = document.createElement('button');
             clapButton.className = 'clap-btn';
             clapButton.id = btnId;
-            clapButton.textContent = `👏 ${entry.claps}`;
+            clapButton.textContent = `▲ ${entry.claps}`;
             clapButton.setAttribute('onclick', `executeClapAction('${entry.timestamp}', '${btnId}')`);
             footerDiv.appendChild(clapButton);
 
