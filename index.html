@@ -695,7 +695,7 @@ document.getElementById('username').addEventListener('input', (e) => {
             
             // Text Modifiers
             safeHtml = safeHtml.replace(/\*\*(.*?)\*\*/g, '<span class="mk-bold">$1</span>');
-            safeHtml = safeHtml.replace(/\*(.*?)\*/g, '<span class="mk-italic">$1</span>');
+            safeHtml = safeHtml.replace(/\*(.*?)\*.*/g, '<span class="mk-italic">$1</span>');
             safeHtml = safeHtml.replace(/~(.*?)~/g, '<span class="mk-strike">$1</span>');
             safeHtml = safeHtml.replace(/_(.*?)_/g, '<span class="mk-underline">$1</span>');
             safeHtml = safeHtml.replace(/\+(.*?)\+/g, '<span class="mk-glow">$1</span>');
@@ -833,68 +833,84 @@ window.adminFetchSystemLogs = async function() {
             renderActivePageData();
         };
 
-window.fetchMessages = async function() {
-    try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        
-        if (data.length === 0) {
-            board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>No entries yet.</div>";
-            document.getElementById('paginationControls').innerHTML = '';
-            return;
+        async function fetchMessages() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>No entries yet.</div>";
+                    document.getElementById('paginationControls').innerHTML = '';
+                    return;
+                }
+
+                // Restore incremental chronological indexes
+                const indexedEntries = [...data].reverse().map((entry, idx) => ({
+                    ...entry,
+                    postNum: idx + 1,
+                    claps: entry.claps || 0,
+                    pinned: entry.pinned || false,
+                    replies: []
+                }));
+
+                const mainThreads = [];
+                const allReplies = [];
+                const postMap = {};
+
+                // Step 1: Map all nodes and separate baseline OPs from general replies
+                indexedEntries.forEach(entry => {
+                    postMap[entry.postNum] = entry;
+                    const match = entry.message.match(/>>(\d+)/);
+                    entry.parentId = match ? parseInt(match[1], 10) : null;
+
+                    if (entry.parentId && entry.parentId < entry.postNum && indexedEntries.some(e => e.postNum === entry.parentId)) {
+                        allReplies.push(entry);
+                    } else {
+                        mainThreads.push(entry);
+                    }
+                });
+
+                // Step 2: Trace every single reply back to its ultimate OP ancestor root thread
+                allReplies.forEach(reply => {
+                    let currentParent = postMap[reply.parentId];
+                    while (currentParent && currentParent.parentId && postMap[currentParent.parentId] && currentParent.parentId < currentParent.postNum) {
+                        currentParent = postMap[currentParent.parentId];
+                    }
+
+                    if (currentParent) {
+                        currentParent.replies.push(reply);
+                    } else {
+                        // Fallback fallback if parent tracking reference drops
+                        mainThreads.push(reply);
+                    }
+                });
+
+                // Step 3: Calculate proper chronological bumping times
+                mainThreads.forEach(thread => {
+                    if (thread.replies.length > 0) {
+                        // Sort child replies chronologically inside the thread tree family array
+                        thread.replies.sort((a, b) => a.postNum - b.postNum);
+                        thread.lastBumpTime = Math.max(...thread.replies.map(r => new Date(r.timestamp).getTime()));
+                    } else {
+                        thread.lastBumpTime = new Date(thread.timestamp).getTime();
+                    }
+                });
+
+                // Priority sorting: Float pinned items to the top, then sort by bump signature time
+                mainThreads.sort((a, b) => {
+                    if (a.pinned && !b.pinned) return -1;
+                    if (!a.pinned && b.pinned) return 1;
+                    return b.lastBumpTime - a.lastBumpTime;
+                });
+
+                allProcessedThreads = mainThreads;
+                applyFiltersAndRender();
+
+            } catch (err) {
+                console.error(err);
+                board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>Failed to load message boards.</div>";
+            }
         }
-
-        const postMap = {};
-        const topLevelThreads = [];
-
-        // 1. Map all posts by their unique signatures
-        data.forEach(post => {
-            post.replies = [];
-            // Fallback tracking key
-            const uniqueId = post.id || post.timestamp;
-            postMap[uniqueId] = post;
-            
-            if (!post.parentId) {
-                topLevelThreads.push(post);
-            }
-        });
-
-        // 2. Build the relationship links
-        data.forEach(post => {
-            if (post.parentId && postMap[post.parentId]) {
-                postMap[post.parentId].replies.push(post);
-            } else if (post.parentId) {
-                // If the parent thread doesn't exist/was wiped, treat as top level thread
-                topLevelThreads.push(post);
-            }
-        });
-
-        board.innerHTML = '';
-
-        // 3. Render threads and their replies into the DOM
-        topLevelThreads.forEach(thread => {
-            const groupDiv = document.createElement('div');
-            groupDiv.className = 'thread-group';
-            
-            // Render Original Post (OP) -> Use 'message-box' (Full width)
-            groupDiv.appendChild(createPostElement(thread, 'message-box', true));
-            
-            // Sort replies old-to-new
-            thread.replies.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-            
-            // Render all replies inside this thread group -> Use 'reply-box' (Indented)
-            thread.replies.forEach(reply => {
-                groupDiv.appendChild(createPostElement(reply, 'reply-box', false));
-            });
-            
-            board.appendChild(groupDiv);
-        });
-
-    } catch (err) {
-        console.error(err);
-        board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>Failed to load message boards.</div>";
-    }
-};
 
         function applyFiltersAndRender() {
             if (!searchQuery) {
