@@ -13,7 +13,6 @@
             --accent-glow: #00ff00;
         }
 
-        /* Custom font declaration for blue text rule */
         @font-face {
             font-family: 'TestFont1';
             src: url('test/font1.ttf') format('truetype');
@@ -46,7 +45,6 @@
             gap: 24px;
         }
 
-        /* Top thread prompt block styled like the terminal panel panels */
         .thread-prompt {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(20px);
@@ -65,7 +63,6 @@
             color: var(--text-main);
         }
 
-        /* Main rules card redone in dark glassmorphism */
         .rules-card {
             background: rgba(255, 255, 255, 0.01);
             backdrop-filter: blur(20px);
@@ -99,12 +96,31 @@
             margin-bottom: 6px;
         }
 
-        /* Input Form styling integrated with landing page button assets */
+        /* Responsive UI Search Bar asset element style config */
+        .search-box-wrap {
+            width: 100%;
+        }
+        .search-box-wrap input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 12px;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .search-box-wrap input:focus {
+            border-color: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
         form {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-top: 4px;
+            position: relative;
         }
         
         form input, form textarea {
@@ -123,6 +139,14 @@
             background: rgba(255, 255, 255, 0.04);
             outline: none;
         }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-top: -8px;
+            padding-right: 4px;
+        }
         
         form button {
             background: rgba(255, 255, 255, 0.05);
@@ -139,21 +163,31 @@
             transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
         }
         
-        form button:hover {
+        form button:hover:not(:disabled) {
             background: #ffffff;
             color: #000000;
             border-color: #ffffff;
             box-shadow: 0 0 15px #ffffff;
         }
 
-        /* Group Container for a main Thread Post + its Sub-replies */
+        form button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         .thread-group {
             display: flex;
             flex-direction: column;
             margin-top: 12px;
         }
 
-        /* Main OP Thread Box output matching the glass layout */
+        .message-box, .reply-box {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
         .message-box {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(20px);
@@ -161,23 +195,18 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-        /* Sub-replies styling looking explicitly distinct like image_de04be.png */
         .reply-box {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px; /* Smoothed corner since the left accent bar is removed */
+            border-radius: 12px;
             padding: 15px 20px;
             margin-top: 8px;
-            margin-left: 30px; /* Distinctly indented layout offset */
+            margin-left: 30px;
             max-width: calc(100% - 30px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
         }
         
-        /* Subtle textboard reply arrow pointer symbol tracking left boundary margin */
         .reply-box::before {
             content: ">>";
             position: absolute;
@@ -224,6 +253,76 @@
             line-height: 1.6; 
             white-space: pre-wrap; 
             font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        /* Clapping interactives layout config anchor styles */
+        .post-footer {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: auto;
+        }
+
+        .clap-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            font-family: inherit;
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .clap-btn:hover {
+            color: #ffaa00;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* Thread Collapse/Expand toggle banner rules */
+        .collapse-banner {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            color: #3388ff;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 8px;
+            margin-top: 8px;
+            margin-left: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .collapse-banner:hover {
+            background: rgba(51, 136, 255, 0.05);
+            text-shadow: 0 0 4px rgba(51, 136, 255, 0.4);
+        }
+
+        /* Pagination Control Module styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+        }
+
+        .pag-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .pag-btn:hover:not(:disabled) {
+            background: #ffffff;
+            color: #000000;
+        }
+        .pag-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
         /* --- Custom Markup CSS Classes --- */
@@ -257,6 +356,23 @@
             color: inherit;
             background: transparent;
         }
+
+        /* --- New Numbered Color Code Styles --- */
+        .c-gray { color: #888888; }
+        .c-red { color: #ff3333; font-weight: bold; }
+        .c-orange { color: #ff9933; }
+        .c-yellow { color: #ffff33; }
+        .c-green { color: #33ff33; }
+        .c-cyan { color: #33ffff; }
+        .c-blue { color: #3366ff; }
+        .c-indigo { color: #6600ff; }
+        .c-violet { color: #cc33ff; }
+        
+        @keyframes rainbow-anim {
+            0% { color: #ff3333; } 16% { color: #ff9933; } 33% { color: #ffff33; }
+            50% { color: #33ff33; } 66% { color: #33ffff; } 83% { color: #3366ff; } 100% { color: #ff3333; }
+        }
+        .c-rainbow { animation: rainbow-anim 4s infinite linear; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -276,13 +392,20 @@
             </ol>
         </div>
 
+        <div class="search-box-wrap">
+            <input type="text" id="boardSearch" placeholder="Search entries..." autocomplete="off">
+        </div>
+
         <form id="guestbookForm">
             <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
             <textarea id="message" placeholder="Put your text here." rows="5" required maxlength="700"></textarea>
-            <button type="submit">SUBMIT NEW POST</button>
+            <div class="char-counter" id="charCount">0 / 700</div>
+            <button type="submit" id="submitBtn">SUBMIT NEW POST</button>
         </form>
 
         <div id="boardEntries">Mapping database links...</div>
+        
+        <div class="pagination-container" id="paginationControls"></div>
 
     </div>
 
@@ -292,6 +415,29 @@
         const form = document.getElementById('guestbookForm');
         const board = document.getElementById('boardEntries');
         const messageInput = document.getElementById('message');
+        const charCount = document.getElementById('charCount');
+        const searchInput = document.getElementById('boardSearch');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Global states structures
+        let allProcessedThreads = [];
+        let filteredThreads = [];
+        let currentPage = 1;
+        const threadsPerPage = 5;
+        let searchQuery = "";
+        let expandedThreadsSet = new Set(); // Track expanded threads locally
+
+        // Live text counter tracker update hook
+        messageInput.addEventListener('input', () => {
+            charCount.textContent = `${messageInput.value.length} / 700`;
+        });
+
+        // Live searchable text filter event engine
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value.toLowerCase().trim();
+            currentPage = 1; 
+            applyFiltersAndRender();
+        });
 
         function parseTextboardMarkup(rawText) {
             let safeHtml = rawText
@@ -300,6 +446,18 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+
+            // Explicit Custom Color Codes %0 - %9 Parser Engine
+            safeHtml = safeHtml.replace(/%0\((.*?)\)/g, '<span class="c-gray">$1</span>');
+            safeHtml = safeHtml.replace(/%1\((.*?)\)/g, '<span class="c-red">$1</span>');
+            safeHtml = safeHtml.replace(/%2\((.*?)\)/g, '<span class="c-orange">$1</span>');
+            safeHtml = safeHtml.replace(/%3\((.*?)\)/g, '<span class="c-yellow">$1</span>');
+            safeHtml = safeHtml.replace(/%4\((.*?)\)/g, '<span class="c-green">$1</span>');
+            safeHtml = safeHtml.replace(/%5\((.*?)\)/g, '<span class="c-cyan">$1</span>');
+            safeHtml = safeHtml.replace(/%6\((.*?)\)/g, '<span class="c-blue">$1</span>');
+            safeHtml = safeHtml.replace(/%7\((.*?)\)/g, '<span class="c-indigo">$1</span>');
+            safeHtml = safeHtml.replace(/%8\((.*?)\)/g, '<span class="c-violet">$1</span>');
+            safeHtml = safeHtml.replace(/%9\((.*?)\)/g, '<span class="c-rainbow">$1</span>');
 
             safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
             safeHtml = safeHtml.replace(/^#\s*(.*?)$/gm, '<span class="mk-large">$1</span>');
@@ -318,7 +476,44 @@
 
         window.insertReplyTag = function(num) {
             messageInput.value += `>>${num} `;
+            messageInput.dispatchEvent(new Event('input'));
             messageInput.focus();
+        };
+
+        // Increment Clap action execution trigger handler
+        window.executeClapAction = async function(timestamp, btnId) {
+            const hasClapped = localStorage.getItem(`clapped_${timestamp}`);
+            if (hasClapped) {
+                alert("You've already clapped for this post.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/clap`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timestamp })
+                });
+                if (response.ok) {
+                    localStorage.setItem(`clapped_${timestamp}`, "true");
+                    const targetBtn = document.getElementById(btnId);
+                    if (targetBtn) {
+                        const currentCount = parseInt(targetBtn.textContent.replace('👏 ', ''), 10) || 0;
+                        targetBtn.textContent = `👏 ${currentCount + 1}`;
+                    }
+                }
+            } catch (err) {
+                console.error("Clap synchronization failed.");
+            }
+        };
+
+        window.toggleThreadExpansion = function(opPostNum) {
+            if (expandedThreadsSet.has(opPostNum)) {
+                expandedThreadsSet.delete(opPostNum);
+            } else {
+                expandedThreadsSet.add(opPostNum);
+            }
+            renderActivePageData();
         };
 
         async function fetchMessages() {
@@ -328,14 +523,14 @@
                 
                 if (data.length === 0) {
                     board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>Nothing yet. Post something, goy.</div>";
+                    document.getElementById('paginationControls').innerHTML = '';
                     return;
                 }
 
-                board.innerHTML = '';
-                
                 const indexedEntries = [...data].reverse().map((entry, idx) => ({
                     ...entry,
-                    postNum: idx + 1
+                    postNum: idx + 1,
+                    claps: entry.claps || 0
                 }));
 
                 const mainThreads = [];
@@ -354,33 +549,95 @@
                 });
 
                 mainThreads.forEach(thread => {
-                    const threadReplies = repliesMap[thread.postNum] || [];
-                    if (threadReplies.length > 0) {
-                        thread.lastBumpTime = Math.max(...threadReplies.map(r => new Date(r.timestamp).getTime()));
+                    thread.replies = repliesMap[thread.postNum] || [];
+                    if (thread.replies.length > 0) {
+                        thread.lastBumpTime = Math.max(...thread.replies.map(r => new Date(r.timestamp).getTime()));
                     } else {
                         thread.lastBumpTime = new Date(thread.timestamp).getTime();
                     }
                 });
 
                 mainThreads.sort((a, b) => b.lastBumpTime - a.lastBumpTime);
+                allProcessedThreads = mainThreads;
 
-                mainThreads.forEach(thread => {
-                    const groupDiv = document.createElement('div');
-                    groupDiv.className = 'thread-group';
-
-                    groupDiv.appendChild(createPostElement(thread, 'message-box'));
-
-                    const threadReplies = repliesMap[thread.postNum] || [];
-                    threadReplies.forEach(reply => {
-                        groupDiv.appendChild(createPostElement(reply, 'reply-box'));
-                    });
-
-                    board.appendChild(groupDiv);
-                });
+                applyFiltersAndRender();
 
             } catch (err) {
                 board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>ERROR: heckin error in the mainframe...</div>";
             }
+        }
+
+        function applyFiltersAndRender() {
+            if (!searchQuery) {
+                filteredThreads = allProcessedThreads;
+            } else {
+                filteredThreads = allProcessedThreads.filter(thread => {
+                    const opMatch = thread.username.toLowerCase().includes(searchQuery) || thread.message.toLowerCase().includes(searchQuery);
+                    const replyMatch = thread.replies.some(r => r.username.toLowerCase().includes(searchQuery) || r.message.toLowerCase().includes(searchQuery));
+                    return opMatch || replyMatch;
+                });
+            }
+            renderActivePageData();
+        }
+
+        function renderActivePageData() {
+            board.innerHTML = '';
+            
+            if (filteredThreads.length === 0) {
+                board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>No matches found matching search queries.</div>";
+                document.getElementById('paginationControls').innerHTML = '';
+                return;
+            }
+
+            const totalPages = Math.ceil(filteredThreads.length / threadsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            const startIndex = (currentPage - 1) * threadsPerPage;
+            const endIndex = startIndex + threadsPerPage;
+            const pageThreads = filteredThreads.slice(startIndex, endIndex);
+
+            pageThreads.forEach(thread => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'thread-group';
+
+                // Render Original Poster item box element
+                groupDiv.appendChild(createPostElement(thread, 'message-box'));
+
+                const totalReplies = thread.replies.length;
+                
+                if (totalReplies > 3 && !expandedThreadsSet.has(thread.postNum)) {
+                    // Render hidden tracking view window header interface banner
+                    const hiddenCount = totalReplies - 3;
+                    const banner = document.createElement('div');
+                    banner.className = 'collapse-banner';
+                    banner.textContent = `[+] click to unfold ${hiddenCount} hidden reply entries`;
+                    banner.setAttribute('onclick', `toggleThreadExpansion(${thread.postNum})`);
+                    
+                    groupDiv.appendChild(banner);
+
+                    // Show only the 3 most recent replies
+                    const cutReplies = thread.replies.slice(-3);
+                    cutReplies.forEach(reply => {
+                        groupDiv.appendChild(createPostElement(reply, 'reply-box'));
+                    });
+                } else {
+                    if (totalReplies > 3) {
+                        const banner = document.createElement('div');
+                        banner.className = 'collapse-banner';
+                        banner.textContent = `[-] collapse thread view pipeline`;
+                        banner.setAttribute('onclick', `toggleThreadExpansion(${thread.postNum})`);
+                        groupDiv.appendChild(banner);
+                    }
+                    
+                    thread.replies.forEach(reply => {
+                        groupDiv.appendChild(createPostElement(reply, 'reply-box'));
+                    });
+                }
+
+                board.appendChild(groupDiv);
+            });
+
+            renderPaginationControls(totalPages);
         }
 
         function createPostElement(entry, className) {
@@ -416,9 +673,78 @@
             textDiv.className = 'text-content';
             textDiv.innerHTML = parseTextboardMarkup(entry.message);
 
+            const footerDiv = document.createElement('div');
+            footerDiv.className = 'post-footer';
+
+            const btnId = `clap-${entry.timestamp.replace(/[^0-9]/g, '')}`;
+            const clapButton = document.createElement('button');
+            clapButton.className = 'clap-btn';
+            clapButton.id = btnId;
+            clapButton.textContent = `${entry.claps}`;
+            clapButton.setAttribute('onclick', `executeClapAction('${entry.timestamp}', '${btnId}')`);
+            footerDiv.appendChild(clapButton);
+
             box.appendChild(metaDiv);
             box.appendChild(textDiv);
+            box.appendChild(footerDiv);
             return box;
+        }
+
+        function renderPaginationControls(totalPages) {
+            const container = document.getElementById('paginationControls');
+            container.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            const firstBtn = document.createElement('button');
+            firstBtn.className = 'pag-btn';
+            firstBtn.textContent = '[First]';
+            firstBtn.disabled = (currentPage === 1);
+            firstBtn.onclick = () => { currentPage = 1; renderActivePageData(); };
+            container.appendChild(firstBtn);
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pag-btn';
+            prevBtn.textContent = '[Prev]';
+            prevBtn.disabled = (currentPage === 1);
+            prevBtn.onclick = () => { currentPage--; renderActivePageData(); };
+            container.appendChild(prevBtn);
+
+            const statusSpan = document.createElement('span');
+            statusSpan.textContent = ` Page ${currentPage} / ${totalPages} `;
+            container.appendChild(statusSpan);
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pag-btn';
+            nextBtn.textContent = '[Next]';
+            nextBtn.disabled = (currentPage === totalPages);
+            nextBtn.onclick = () => { currentPage++; renderActivePageData(); };
+            container.appendChild(nextBtn);
+
+            const lastBtn = document.createElement('button');
+            lastBtn.className = 'pag-btn';
+            lastBtn.textContent = '[Last]';
+            lastBtn.disabled = (currentPage === totalPages);
+            lastBtn.onclick = () => { currentPage = totalPages; renderActivePageData(); };
+            container.appendChild(lastBtn);
+        }
+
+        // Rate limiting handler logic configuration block
+        function executeRateLimitCountdown() {
+            let countdown = 10;
+            submitBtn.disabled = true;
+            submitBtn.textContent = `Cooldown. (${countdown}s)`;
+
+            const timer = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Send Post.";
+                } else {
+                    submitBtn.textContent = `Cooldown. (${countdown}s)`;
+                }
+            }, 1000);
         }
 
         form.addEventListener('submit', async (e) => {
@@ -435,6 +761,8 @@
 
                 if (response.ok) {
                     messageInput.value = '';
+                    charCount.textContent = "0 / 700";
+                    executeRateLimitCountdown();
                     fetchMessages();
                 } else {
                     alert("Transmission rejected.");
@@ -444,7 +772,13 @@
             }
         });
 
+        // Initialize board execution triggers
         fetchMessages();
+
+        // Background Auto Refresh: poll entries stack every 10 seconds silently
+        setInterval(() => {
+            fetchMessages();
+        }, 10000);
     </script>
 </body>
 </html>
