@@ -168,8 +168,7 @@
         .reply-box {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: 3px solid #3388ff; /* Visual marker link anchor accent */
-            border-radius: 0 12px 12px 12px;
+            border-radius: 12px; /* Smoothed corner since the left accent bar is removed */
             padding: 15px 20px;
             margin-top: 8px;
             margin-left: 30px; /* Distinctly indented layout offset */
@@ -334,23 +333,18 @@
 
                 board.innerHTML = '';
                 
-                // Chronological index tracking wrapper (oldest = No.1)
-                const totalPosts = data.length;
                 const indexedEntries = [...data].reverse().map((entry, idx) => ({
                     ...entry,
                     postNum: idx + 1
                 }));
 
-                // Thread tree assembly structures
                 const mainThreads = [];
                 const repliesMap = {};
 
-                // Map target references and pull threads apart dynamically
                 indexedEntries.forEach(entry => {
                     const match = entry.message.match(/>>(\d+)/);
                     const parentId = match ? parseInt(match[1], 10) : null;
 
-                    // Verify the targeted parent number exists on the board, otherwise count as OP
                     if (parentId && parentId < entry.postNum && indexedEntries.some(e => e.postNum === parentId)) {
                         if (!repliesMap[parentId]) repliesMap[parentId] = [];
                         repliesMap[parentId].push(entry);
@@ -359,29 +353,23 @@
                     }
                 });
 
-                // Thread bumping calculation structure
                 mainThreads.forEach(thread => {
                     const threadReplies = repliesMap[thread.postNum] || [];
                     if (threadReplies.length > 0) {
-                        // The bump time becomes the timestamp of its newest reply item
                         thread.lastBumpTime = Math.max(...threadReplies.map(r => new Date(r.timestamp).getTime()));
                     } else {
                         thread.lastBumpTime = new Date(thread.timestamp).getTime();
                     }
                 });
 
-                // Sort threads by latest bump time down to oldest
                 mainThreads.sort((a, b) => b.lastBumpTime - a.lastBumpTime);
 
-                // Render compiled structure sets
                 mainThreads.forEach(thread => {
                     const groupDiv = document.createElement('div');
                     groupDiv.className = 'thread-group';
 
-                    // 1. Render primary thread item (OP Box)
                     groupDiv.appendChild(createPostElement(thread, 'message-box'));
 
-                    // 2. Nest sub-replies directly underneath, matching image_de04be.png reference layout
                     const threadReplies = repliesMap[thread.postNum] || [];
                     threadReplies.forEach(reply => {
                         groupDiv.appendChild(createPostElement(reply, 'reply-box'));
