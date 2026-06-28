@@ -212,7 +212,6 @@
             text-align: center;
         }
 
-        /* Minimal Traditional Admin Console */
         .admin-dashboard {
             display: none;
             width: 100%;
@@ -276,7 +275,6 @@
             display: none;
         }
 
-        /* Imageboard Threads UI */
         .thread-group {
             display: flex;
             flex-direction: column;
@@ -435,7 +433,6 @@
             opacity: 0.3;
         }
 
-        /* --- STYLED MARKDOWN STRUCTURAL PARSERS --- */
         .mk-large { font-size: 1.3rem; font-weight: bold; display: block; margin: 4px 0; color: #ffffff; }
         .mk-medium { font-size: 1.1rem; font-weight: bold; display: block; margin: 3px 0; color: #dddddd; }
         .mk-green { color: #789922; }
@@ -464,7 +461,6 @@
             background: transparent;
         }
 
-        /* Custom Color Signatures */
         .c-gray { color: #888888; }
         .c-red { color: #ff3333; }
         .c-orange { color: #ff9933; }
@@ -594,7 +590,6 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
 
-            // Custom Single-Line Color Parsers without requiring parenthesis
             safeHtml = safeHtml.replace(/^([^%\n]*?)%gray (.*)$/gm, '$1<span class="c-gray">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%red (.*)$/gm, '$1<span class="c-red">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%orange (.*)$/gm, '$1<span class="c-orange">$2</span>');
@@ -606,16 +601,13 @@
             safeHtml = safeHtml.replace(/^([^%\n]*?)%violet (.*)$/gm, '$1<span class="c-violet">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%rainbow (.*)$/gm, '$1<span class="c-rainbow">$2</span>');
 
-            // Header Elements
             safeHtml = safeHtml.replace(/^# (.*?)$/gm, '<span class="mk-large">$1</span>');
             safeHtml = safeHtml.replace(/^## (.*?)$/gm, '<span class="mk-medium">$1</span>');
 
-            // Text Board Indicators
             safeHtml = safeHtml.replace(/^&gt;(.*?)$/gm, '<span class="mk-green">&gt;$1</span>');
             safeHtml = safeHtml.replace(/^&lt;(.*?)$/gm, '<span class="mk-orange">&lt;$1</span>');
             safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
             
-            // Text Modifiers
             safeHtml = safeHtml.replace(/\*\*(.*?)\*\*/g, '<span class="mk-bold">$1</span>');
             safeHtml = safeHtml.replace(/\*(.*?)\*/g, '<span class="mk-italic">$1</span>');
             safeHtml = safeHtml.replace(/~(.*?)~/g, '<span class="mk-strike">$1</span>');
@@ -633,7 +625,6 @@
             messageInput.focus();
         };
 
-        /* --- Admin Pipelines (Prompts Removed for Swift Modification) --- */
         window.adminWipeDatabase = async function() {
             const res = await fetch(`${API_URL}/admin/wipe`, {
                 method: "POST", headers: { "X-Admin-Token": ADMIN_SECRET }
