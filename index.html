@@ -697,87 +697,95 @@
             messageInput.focus();
         };
 
-        /* --- Admin Pipelines --- */
-        window.adminWipeDatabase = async function() {
-            const res = await fetch(`${API_URL}/admin/wipe`, {
-                method: "POST", headers: { "X-Admin-Token": ADMIN_SECRET }
-            });
-            alert(await res.text());
-            fetchMessages();
-        };
+/* --- Fixed Admin Pipelines --- */
+window.adminWipeDatabase = async function() {
+    const typedSecret = document.getElementById('username').value; // Grab it live from the input box
+    const res = await fetch(`${API_URL}/admin/wipe`, {
+        method: "POST", 
+        headers: { "X-Admin-Token": typedSecret }
+    });
+    alert(await res.text());
+    fetchMessages();
+};
 
-        window.adminDeleteSinglePost = async function(timestamp) {
-            const res = await fetch(`${API_URL}/admin/delete-single`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
-                body: JSON.stringify({ timestamp })
-            });
-            alert(await res.text());
-            fetchMessages();
-        };
+window.adminDeleteSinglePost = async function(timestamp) {
+    const typedSecret = document.getElementById('username').value;
+    const res = await fetch(`${API_URL}/admin/delete-single`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+        body: JSON.stringify({ timestamp })
+    });
+    alert(await res.text());
+    fetchMessages();
+};
 
-        window.adminTogglePinThread = async function(timestamp) {
-            const res = await fetch(`${API_URL}/admin/toggle-pin`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
-                body: JSON.stringify({ timestamp })
-            });
-            alert(await res.text());
-            fetchMessages();
-        };
+window.adminTogglePinThread = async function(timestamp) {
+    const typedSecret = document.getElementById('username').value;
+    const res = await fetch(`${API_URL}/admin/toggle-pin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+        body: JSON.stringify({ timestamp })
+    });
+    alert(await res.text());
+    fetchMessages();
+};
 
-        window.adminBanIP = async function(actionType) {
-            const ipVal = document.getElementById('banTargetIp').value.trim();
-            if(!ipVal) return alert("Enter IP address.");
-            const res = await fetch(`${API_URL}/admin/ban`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
-                body: JSON.stringify({ ipToBan: ipVal, action: actionType })
-            });
-            alert(await res.text());
-        };
+window.adminBanIP = async function(actionType) {
+    const ipVal = document.getElementById('banTargetIp').value.trim();
+    if(!ipVal) return alert("Enter IP address.");
+    const typedSecret = document.getElementById('username').value;
+    const res = await fetch(`${API_URL}/admin/ban`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+        body: JSON.stringify({ ipToBan: ipVal, action: actionType })
+    });
+    alert(await res.text());
+};
 
-        window.adminPurgeByTripcode = async function() {
-            const tripVal = document.getElementById('purgeTargetTrip').value.trim();
-            if(!tripVal) return alert("Enter tripcode.");
-            const res = await fetch(`${API_URL}/admin/delete-by-tripcode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
-                body: JSON.stringify({ targetTripcode: tripVal })
-            });
-            alert(await res.text());
-            fetchMessages();
-        };
+window.adminPurgeByTripcode = async function() {
+    const tripVal = document.getElementById('purgeTargetTrip').value.trim();
+    if(!tripVal) return alert("Enter tripcode.");
+    const typedSecret = document.getElementById('username').value;
+    const res = await fetch(`${API_URL}/admin/delete-by-tripcode`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+        body: JSON.stringify({ targetTripcode: tripVal })
+    });
+    alert(await res.text());
+    fetchMessages();
+};
 
-        window.adminInspectTripcode = async function() {
-            const tripVal = document.getElementById('purgeTargetTrip').value.trim();
-            if(!tripVal) return alert("Enter tripcode to inspect.");
-            const pane = document.getElementById('adminLogOutput');
-            
-            const res = await fetch(`${API_URL}/admin/inspect-tripcode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
-                body: JSON.stringify({ targetTripcode: tripVal })
-            });
-            const data = await res.json();
-            
-            pane.style.display = 'block';
-            let ipReport = "";
-            for (const [ip, count] of Object.entries(data.associatedIps)) {
-                ipReport += `  - ${ip} (used in ${count} post(s))\n`;
-            }
-            pane.textContent = `INSPECT REPORT FOR ${data.tripcode}\nTotal Board Count: ${data.postCount} posts\nLinked IP Signatures:\n${ipReport || "  No active IPs recorded."}`;
-        };
+window.adminInspectTripcode = async function() {
+    const tripVal = document.getElementById('purgeTargetTrip').value.trim();
+    if(!tripVal) return alert("Enter tripcode to inspect.");
+    const pane = document.getElementById('adminLogOutput');
+    const typedSecret = document.getElementById('username').value;
+    
+    const res = await fetch(`${API_URL}/admin/inspect-tripcode`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+        body: JSON.stringify({ targetTripcode: tripVal })
+    });
+    const data = await res.json();
+    
+    pane.style.display = 'block';
+    let ipReport = "";
+    for (const [ip, count] of Object.entries(data.associatedIps)) {
+        ipReport += `  - ${ip} (used in ${count} post(s))\n`;
+    }
+    pane.textContent = `INSPECT REPORT FOR ${data.tripcode}\nTotal Board Count: ${data.postCount} posts\nLinked IP Signatures:\n${ipReport || "  No active IPs recorded."}`;
+};
 
-        window.adminFetchSystemLogs = async function() {
-            const pane = document.getElementById('adminLogOutput');
-            const res = await fetch(`${API_URL}/admin/logs`, {
-                headers: { "X-Admin-Token": ADMIN_SECRET }
-            });
-            const data = await res.json();
-            pane.style.display = 'block';
-            pane.textContent = data.map(l => `[${l.timestamp}] IP:${l.ip} -> ${l.action}`).join('\n') || "No operations logged.";
-        };
+window.adminFetchSystemLogs = async function() {
+    const pane = document.getElementById('adminLogOutput');
+    const typedSecret = document.getElementById('username').value;
+    const res = await fetch(`${API_URL}/admin/logs`, {
+        headers: { "X-Admin-Token": typedSecret }
+    });
+    const data = await res.json();
+    pane.style.display = 'block';
+    pane.textContent = data.map(l => `[${l.timestamp}] IP:${l.ip} -> ${l.action}`).join('\n') || "No operations logged.";
+};
 
         window.executeClapAction = async function(timestamp, btnId) {
             const hasClapped = localStorage.getItem(`clapped_${timestamp}`);
