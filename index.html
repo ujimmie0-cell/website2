@@ -212,6 +212,7 @@
             text-align: center;
         }
 
+        /* Minimal Traditional Admin Console */
         .admin-dashboard {
             display: none;
             width: 100%;
@@ -275,6 +276,7 @@
             display: none;
         }
 
+        /* Imageboard Threads UI */
         .thread-group {
             display: flex;
             flex-direction: column;
@@ -290,6 +292,7 @@
             padding: 12px 16px;
             width: 100%;
             margin-bottom: 6px;
+            position: relative;
         }
 
         .reply-box {
@@ -347,6 +350,17 @@
             color: #D10088; 
             font-weight: bold; 
         }
+
+        .pin-indicator {
+            color: #ffaa00;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            padding: 0px 4px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
         
         .text-content { 
             word-break: break-word; 
@@ -378,7 +392,7 @@
             color: #ffaa00;
         }
 
-        .admin-inline-del-btn {
+        .admin-inline-del-btn, .admin-inline-pin-btn {
             background: transparent;
             border: none;
             color: #ff3333;
@@ -387,7 +401,10 @@
             font-size: 0.7rem;
             display: none;
         }
-        .admin-inline-del-btn:hover {
+        .admin-inline-pin-btn {
+            color: #ffaa00;
+        }
+        .admin-inline-del-btn:hover, .admin-inline-pin-btn:hover {
             text-decoration: underline;
         }
 
@@ -433,6 +450,19 @@
             opacity: 0.3;
         }
 
+        /* Raw Code Block Style to escape markup rules */
+        .mk-raw-code {
+            font-family: Courier, monospace;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--board-border);
+            padding: 6px 10px;
+            display: block;
+            margin: 6px 0;
+            border-radius: 4px;
+            color: #cccccc;
+        }
+
+        /* --- STYLED MARKDOWN STRUCTURAL PARSERS --- */
         .mk-large { font-size: 1.3rem; font-weight: bold; display: block; margin: 4px 0; color: #ffffff; }
         .mk-medium { font-size: 1.1rem; font-weight: bold; display: block; margin: 3px 0; color: #dddddd; }
         .mk-green { color: #789922; }
@@ -461,6 +491,7 @@
             background: transparent;
         }
 
+        /* Custom Color Signatures */
         .c-gray { color: #888888; }
         .c-red { color: #ff3333; }
         .c-orange { color: #ff9933; }
@@ -516,6 +547,7 @@
             </form>
         </div>
 
+        <!-- Minimalist Admin Control Console Panel -->
         <div class="admin-dashboard" id="adminControlPanel">
             <h4>ADMIN PANEL</h4>
             <div class="admin-grid">
@@ -583,13 +615,53 @@
         });
 
         function parseTextboardMarkup(rawText) {
-            let safeHtml = rawText
+            // First step: Isolate raw code blocks wrapped in triple backticks
+            const segments = [];
+            const codeBlockRegex = /```([\s\S]*?)```/g;
+            let lastIndex = 0;
+            let match;
+
+            while ((match = codeBlockRegex.exec(rawText)) !== null) {
+                // Add preceding text before code segment
+                if (match.index > lastIndex) {
+                    segments.push({ type: 'text', content: rawText.substring(lastIndex, match.index) });
+                }
+                // Add the code content completely unformatted
+                segments.push({ type: 'code', content: match[1] });
+                lastIndex = codeBlockRegex.lastIndex;
+            }
+            if (lastIndex < rawText.length) {
+                segments.push({ type: 'text', content: rawText.substring(lastIndex) });
+            }
+
+            // If there are no code blocks, parse everything normally
+            if (segments.length === 0) {
+                return applyTextFormatting(rawText);
+            }
+
+            return segments.map(seg => {
+                if (seg.type === 'code') {
+                    // Escape basic HTML inside code block but completely bypass internal markdown parsing
+                    let cleanCode = seg.content
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;");
+                    return `<span class="mk-raw-code">${cleanCode}</span>`;
+                } else {
+                    return applyTextFormatting(seg.content);
+                }
+            }).join('');
+        }
+
+        function applyTextFormatting(text) {
+            let safeHtml = text
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
 
+            // Custom Single-Line Color Parsers
             safeHtml = safeHtml.replace(/^([^%\n]*?)%gray (.*)$/gm, '$1<span class="c-gray">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%red (.*)$/gm, '$1<span class="c-red">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%orange (.*)$/gm, '$1<span class="c-orange">$2</span>');
@@ -601,13 +673,16 @@
             safeHtml = safeHtml.replace(/^([^%\n]*?)%violet (.*)$/gm, '$1<span class="c-violet">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%rainbow (.*)$/gm, '$1<span class="c-rainbow">$2</span>');
 
+            // Header Elements
             safeHtml = safeHtml.replace(/^# (.*?)$/gm, '<span class="mk-large">$1</span>');
             safeHtml = safeHtml.replace(/^## (.*?)$/gm, '<span class="mk-medium">$1</span>');
 
+            // Text Board Indicators
             safeHtml = safeHtml.replace(/^&gt;(.*?)$/gm, '<span class="mk-green">&gt;$1</span>');
             safeHtml = safeHtml.replace(/^&lt;(.*?)$/gm, '<span class="mk-orange">&lt;$1</span>');
             safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
             
+            // Text Modifiers
             safeHtml = safeHtml.replace(/\*\*(.*?)\*\*/g, '<span class="mk-bold">$1</span>');
             safeHtml = safeHtml.replace(/\*(.*?)\*/g, '<span class="mk-italic">$1</span>');
             safeHtml = safeHtml.replace(/~(.*?)~/g, '<span class="mk-strike">$1</span>');
@@ -625,6 +700,7 @@
             messageInput.focus();
         };
 
+        /* --- Admin Pipelines --- */
         window.adminWipeDatabase = async function() {
             const res = await fetch(`${API_URL}/admin/wipe`, {
                 method: "POST", headers: { "X-Admin-Token": ADMIN_SECRET }
@@ -635,6 +711,16 @@
 
         window.adminDeleteSinglePost = async function(timestamp) {
             const res = await fetch(`${API_URL}/admin/delete-single`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
+                body: JSON.stringify({ timestamp })
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
+
+        window.adminTogglePinThread = async function(timestamp) {
+            const res = await fetch(`${API_URL}/admin/toggle-pin`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
                 body: JSON.stringify({ timestamp })
@@ -742,7 +828,8 @@
                 const indexedEntries = [...data].reverse().map((entry, idx) => ({
                     ...entry,
                     postNum: idx + 1,
-                    claps: entry.claps || 0
+                    claps: entry.claps || 0,
+                    pinned: entry.pinned || false
                 }));
 
                 const mainThreads = [];
@@ -769,9 +856,14 @@
                     }
                 });
 
-                mainThreads.sort((a, b) => b.lastBumpTime - a.lastBumpTime);
-                allProcessedThreads = mainThreads;
+                // Priority sorting: Float pinned items to the top, then sort by bump signature time
+                mainThreads.sort((a, b) => {
+                    if (a.pinned && !b.pinned) return -1;
+                    if (!a.pinned && b.pinned) return 1;
+                    return b.lastBumpTime - a.lastBumpTime;
+                });
 
+                allProcessedThreads = mainThreads;
                 applyFiltersAndRender();
 
             } catch (err) {
@@ -810,7 +902,7 @@
             pageThreads.forEach(thread => {
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'thread-group';
-                groupDiv.appendChild(createPostElement(thread, 'message-box'));
+                groupDiv.appendChild(createPostElement(thread, 'message-box', true));
 
                 const totalReplies = thread.replies.length;
                 if (totalReplies > 3 && !expandedThreadsSet.has(thread.postNum)) {
@@ -823,7 +915,7 @@
 
                     const cutReplies = thread.replies.slice(-3);
                     cutReplies.forEach(reply => {
-                        groupDiv.appendChild(createPostElement(reply, 'reply-box'));
+                        groupDiv.appendChild(createPostElement(reply, 'reply-box', false));
                     });
                 } else {
                     if (totalReplies > 3) {
@@ -834,7 +926,7 @@
                         groupDiv.appendChild(banner);
                     }
                     thread.replies.forEach(reply => {
-                        groupDiv.appendChild(createPostElement(reply, 'reply-box'));
+                        groupDiv.appendChild(createPostElement(reply, 'reply-box', false));
                     });
                 }
                 board.appendChild(groupDiv);
@@ -843,7 +935,7 @@
             renderPaginationControls(totalPages);
         }
 
-        function createPostElement(entry, className) {
+        function createPostElement(entry, className, isOpPost = false) {
             const dateStr = new Date(entry.timestamp).toLocaleString('en-US', {
                 year: 'numeric', month: '2-digit', day: '2-digit',
                 hour: '2-digit', minute: '2-digit', second: '2-digit',
@@ -855,6 +947,13 @@
             
             const metaDiv = document.createElement('div');
             metaDiv.className = 'meta';
+
+            if (isOpPost && entry.pinned) {
+                const pinBadge = document.createElement('span');
+                pinBadge.className = 'pin-indicator';
+                pinBadge.textContent = 'Pinned';
+                metaDiv.appendChild(pinBadge);
+            }
             
             const nameSpan = document.createElement('span');
             nameSpan.className = 'poster-name';
@@ -893,12 +992,24 @@
             clapButton.setAttribute('onclick', `executeClapAction('${entry.timestamp}', '${btnId}')`);
             footerDiv.appendChild(clapButton);
 
+            // Inline administrative tools context hooks
             const delButton = document.createElement('button');
             delButton.className = 'admin-inline-del-btn';
             delButton.textContent = "[Delete]";
             delButton.setAttribute('onclick', `adminDeleteSinglePost('${entry.timestamp}')`);
-            if(isAdminLoggedIn) { delButton.style.display = 'inline-block'; }
+            
+            const pinButton = document.createElement('button');
+            pinButton.className = 'admin-inline-pin-btn';
+            pinButton.textContent = entry.pinned ? "[Unpin Thread]" : "[Pin Thread]";
+            pinButton.setAttribute('onclick', `adminTogglePinThread('${entry.timestamp}')`);
+
+            if (isAdminLoggedIn) { 
+                delButton.style.display = 'inline-block'; 
+                if (isOpPost) pinButton.style.display = 'inline-block';
+            }
+            
             footerDiv.appendChild(delButton);
+            footerDiv.appendChild(pinButton);
 
             box.appendChild(metaDiv);
             box.appendChild(textDiv);
