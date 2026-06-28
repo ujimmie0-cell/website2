@@ -11,6 +11,9 @@
             --text-main: #ffffff;
             --text-sub: rgba(255, 255, 255, 0.4);
             --accent-glow: #00ff00;
+            --board-border: rgba(255, 255, 255, 0.08);
+            --reply-bg: rgba(255, 255, 255, 0.03);
+            --form-label-bg: rgba(255, 255, 255, 0.03);
         }
 
         @font-face {
@@ -29,7 +32,7 @@
             background: #000000;
             color: var(--text-main);
             font-family: Courier, monospace, sans-serif;
-            padding: 60px 20px;
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -39,135 +42,142 @@
 
         .board-container {
             width: 100%;
-            max-width: 650px;
+            max-width: 850px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
 
         .thread-prompt {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 16px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: -10px;
         }
         
         .thread-prompt .guestbook-header {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             letter-spacing: 4px;
             text-transform: lowercase;
             color: var(--text-main);
+            font-weight: bold;
         }
 
         .rules-card {
             background: rgba(255, 255, 255, 0.01);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 24px;
-            font-size: 0.85rem;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.7);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--board-border);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
         }
         
         .rules-card h3 {
             text-align: center;
-            margin: 0 0 16px 0;
-            font-size: 1rem;
-            letter-spacing: 3px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
             color: var(--text-main);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .rules-card ol { 
-            margin: 0; 
-            padding-left: 20px; 
-        }
-        
-        .rules-card li {
-            margin-bottom: 6px;
+            padding-left: 18px; 
         }
 
-        /* Responsive UI Search Bar asset element style config */
-        .search-box-wrap {
+        /* Imageboard Style Form Post Box Layout (inspired by image_edd7f6.jpg) */
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 100%;
-        }
-        .search-box-wrap input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            color: var(--text-main);
-            padding: 12px;
-            font-family: inherit;
-            font-size: 0.85rem;
-        }
-        .search-box-wrap input:focus {
-            border-color: rgba(255, 255, 255, 0.2);
-            outline: none;
+            margin-bottom: 10px;
         }
 
         form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 4px;
+            display: table;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--board-border);
+        }
+
+        .form-row {
+            display: table-row;
+        }
+
+        .form-label {
+            display: table-cell;
+            background: var(--form-label-bg);
+            border: 1px solid var(--board-border);
+            padding: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--text-main);
+            width: 90px;
+            vertical-align: middle;
+        }
+
+        .form-input-cell {
+            display: table-cell;
+            border: 1px solid var(--board-border);
+            padding: 4px;
             position: relative;
         }
         
         form input, form textarea {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             color: var(--text-main);
-            padding: 14px;
+            padding: 6px 8px;
             font-family: inherit;
-            font-size: 0.9rem;
-            transition: border-color 0.2s, background 0.2s;
+            font-size: 0.85rem;
         }
         
         form input:focus, form textarea:focus {
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.2);
             outline: none;
         }
 
         .char-counter {
-            text-align: right;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-sub);
-            margin-top: -8px;
-            padding-right: 4px;
+            position: absolute;
+            right: 10px;
+            bottom: 8px;
         }
         
+        .submit-row {
+            display: table-row;
+        }
+
+        .submit-cell {
+            display: table-cell;
+            text-align: center;
+            padding: 6px;
+            background: var(--form-label-bg);
+        }
+
         form button {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border: 1px solid var(--board-border);
             color: var(--text-main);
-            padding: 14px;
+            padding: 6px 16px;
             font-family: inherit;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-size: 0.8rem;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
         }
         
         form button:hover:not(:disabled) {
             background: #ffffff;
             color: #000000;
-            border-color: #ffffff;
-            box-shadow: 0 0 15px #ffffff;
         }
 
         form button:disabled {
@@ -175,92 +185,107 @@
             cursor: not-allowed;
         }
 
+        .search-box-wrap {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .search-box-wrap input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--board-border);
+            color: var(--text-main);
+            padding: 8px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        /* Imageboard Traditional Thread Layout */
         .thread-group {
             display: flex;
             flex-direction: column;
-            margin-top: 12px;
-        }
-
-        .message-box, .reply-box {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 16px;
+            margin-top: 10px;
         }
 
         .message-box {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 20px;
+            padding: 6px 0;
+            width: 100%;
         }
 
         .reply-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin-top: 8px;
-            margin-left: 30px;
-            max-width: calc(100% - 30px);
+            background: var(--reply-bg);
+            border: 1px solid var(--board-border);
+            padding: 10px 14px;
+            margin-top: 6px;
+            margin-left: 40px;
+            display: table; /* Shrinks container to content width, like 4chan */
+            max-width: calc(100% - 40px);
+            position: relative;
         }
         
+        .reply-container-wrap {
+            position: relative;
+        }
+
+        /* 4chan styling guides for nested items */
         .reply-box::before {
             content: ">>";
             position: absolute;
-            left: -22px;
-            top: 14px;
+            left: -26px;
+            top: 10px;
             color: rgba(255, 255, 255, 0.15);
-            font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
         
         .meta { 
             color: var(--text-sub); 
             font-size: 0.8rem; 
-            margin-bottom: 12px; 
-            letter-spacing: 0.5px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
-            padding-bottom: 8px;
+            margin-bottom: 6px; 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .poster-name {
+            color: #119955;
+            font-weight: bold;
         }
 
         .post-id-link {
-            color: #3388ff;
+            color: var(--text-sub);
             text-decoration: none;
             cursor: pointer;
-            font-weight: bold;
-            margin-left: 4px;
         }
         .post-id-link:hover {
-            text-shadow: 0 0 5px rgba(51, 136, 255, 0.6);
+            color: #ffaa00;
         }
 
         .reply-tag {
-            color: #3388ff;
+            color: #ffaa00;
             font-weight: bold;
         }
         
         .tripcode { 
             color: #ff0055; 
             font-weight: bold; 
-            text-shadow: 0 0 6px rgba(255, 0, 85, 0.3);
         }
         
         .text-content { 
             word-break: break-word; 
-            line-height: 1.6; 
+            line-height: 1.5; 
             white-space: pre-wrap; 
-            font-size: 0.95rem;
-            margin-bottom: 8px;
+            font-size: 0.85rem;
+            padding-left: 2px;
         }
 
-        /* Clapping interactives layout config anchor styles */
         .post-footer {
             display: flex;
             justify-content: flex-start;
-            margin-top: auto;
+            margin-top: 4px;
         }
 
         .clap-btn {
@@ -268,98 +293,89 @@
             border: none;
             color: var(--text-sub);
             font-family: inherit;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-            transition: color 0.2s, background 0.2s;
+            padding: 2px 4px;
+            transition: color 0.1s;
         }
 
         .clap-btn:hover {
             color: #ffaa00;
-            background: rgba(255, 255, 255, 0.04);
         }
 
-        /* Thread Collapse/Expand toggle banner rules */
         .collapse-banner {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-            color: #3388ff;
-            font-size: 0.8rem;
-            text-align: center;
-            padding: 8px;
-            margin-top: 8px;
-            margin-left: 30px;
-            border-radius: 8px;
+            color: var(--text-sub);
+            font-size: 0.75rem;
+            padding: 6px;
+            margin-left: 40px;
             cursor: pointer;
+            text-decoration: underline;
         }
         .collapse-banner:hover {
-            background: rgba(51, 136, 255, 0.05);
-            text-shadow: 0 0 4px rgba(51, 136, 255, 0.4);
+            color: #ffaa00;
         }
 
-        /* Pagination Control Module styles */
+        /* Pagination Module UI */
         .pagination-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 12px;
-            margin-top: 16px;
-            font-size: 0.85rem;
+            gap: 8px;
+            margin-top: 24px;
+            font-size: 0.8rem;
+            border: 1px solid var(--board-border);
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.01);
         }
 
         .pag-btn {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: #ffaa00;
             cursor: pointer;
+            font-family: inherit;
+            padding: 2px 6px;
         }
         .pag-btn:hover:not(:disabled) {
-            background: #ffffff;
-            color: #000000;
+            text-decoration: underline;
         }
         .pag-btn:disabled {
-            opacity: 0.3;
+            color: var(--text-sub);
             cursor: not-allowed;
+            opacity: 0.5;
         }
 
-        /* --- Custom Markup CSS Classes --- */
-        .mk-large { font-size: 1.3rem; font-weight: bold; display: block; margin: 6px 0; color: #ffffff; }
+        /* --- Markup Style Configurations --- */
+        .mk-large { font-size: 1.2rem; font-weight: bold; display: block; margin: 4px 0; color: #ffffff; }
         .mk-green { color: #789922; }
         .mk-orange { color: #ff8800; }
-        .mk-bold { font-weight: bold; color: #ffffff; }
+        .mk-bold { font-weight: bold; }
         .mk-italic { font-style: italic; }
-        .mk-strike { text-decoration: line-through; opacity: 0.6; }
+        .mk-strike { text-decoration: line-through; opacity: 0.5; }
         .mk-underline { text-decoration: underline; }
         .mk-glow {
             color: #000000 !important;
             background-color: #000000;
-            text-shadow: 0 0 4px var(--accent-glow), 0 0 8px var(--accent-glow), 0 0 12px var(--accent-glow);
-            padding: 2px 4px;
-            border-radius: 4px;
+            text-shadow: 0 0 4px var(--accent-glow), 0 0 8px var(--accent-glow);
+            padding: 0 4px;
+            border-radius: 2px;
             display: inline-block;
         }
         .mk-blue-font { font-family: 'TestFont1', sans-serif; color: #3388ff; }
         .mk-spoiler {
-            filter: blur(5px);
-            background: rgba(255, 255, 255, 0.05);
-            color: transparent;
+            background: #222222;
+            color: #222222;
             cursor: pointer;
-            transition: filter 0.3s ease, color 0.3s ease, background 0.3s ease;
-            padding: 0 4px;
-            border-radius: 3px;
+            padding: 0 2px;
         }
         .mk-spoiler:hover {
-            filter: blur(0);
             color: inherit;
             background: transparent;
         }
 
-        /* --- New Numbered Color Code Styles --- */
+        /* Color Codes System Modifiers */
         .c-gray { color: #888888; }
-        .c-red { color: #ff3333; font-weight: bold; }
+        .c-red { color: #ff3333; }
         .c-orange { color: #ff9933; }
         .c-yellow { color: #ffff33; }
         .c-green { color: #33ff33; }
@@ -380,7 +396,7 @@
     <div class="board-container">
 
         <div class="thread-prompt">
-            <div class="guestbook-header">guestbook</div>
+            <div class="guestbook-header">/vanitas/ - Guestbook</div>
         </div>
 
         <div class="rules-card">
@@ -392,18 +408,35 @@
             </ol>
         </div>
 
+        <div class="form-wrapper">
+            <form id="guestbookForm">
+                <div class="form-row">
+                    <div class="form-label">Name</div>
+                    <div class="form-input-cell">
+                        <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Comment</div>
+                    <div class="form-input-cell">
+                        <textarea id="message" placeholder="Put your text here." rows="4" required maxlength="700"></textarea>
+                        <div class="char-counter" id="charCount">0 / 700</div>
+                    </div>
+                </div>
+                <div class="submit-row">
+                    <div class="form-label">Submit</div>
+                    <div class="submit-cell">
+                        <button type="submit" id="submitBtn">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <div class="search-box-wrap">
             <input type="text" id="boardSearch" placeholder="Search entries..." autocomplete="off">
         </div>
 
-        <form id="guestbookForm">
-            <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
-            <textarea id="message" placeholder="Put your text here." rows="5" required maxlength="700"></textarea>
-            <div class="char-counter" id="charCount">0 / 700</div>
-            <button type="submit" id="submitBtn">SUBMIT NEW POST</button>
-        </form>
-
-        <div id="boardEntries">Mapping database links...</div>
+        <div id="boardEntries">Loading asset configuration maps...</div>
         
         <div class="pagination-container" id="paginationControls"></div>
 
@@ -419,20 +452,17 @@
         const searchInput = document.getElementById('boardSearch');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Global states structures
         let allProcessedThreads = [];
         let filteredThreads = [];
         let currentPage = 1;
         const threadsPerPage = 5;
         let searchQuery = "";
-        let expandedThreadsSet = new Set(); // Track expanded threads locally
+        let expandedThreadsSet = new Set(); 
 
-        // Live text counter tracker update hook
         messageInput.addEventListener('input', () => {
             charCount.textContent = `${messageInput.value.length} / 700`;
         });
 
-        // Live searchable text filter event engine
         searchInput.addEventListener('input', () => {
             searchQuery = searchInput.value.toLowerCase().trim();
             currentPage = 1; 
@@ -447,17 +477,16 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
 
-            // Explicit Custom Color Codes %0 - %9 Parser Engine
-            safeHtml = safeHtml.replace(/%0\((.*?)\)/g, '<span class="c-gray">$1</span>');
-            safeHtml = safeHtml.replace(/%1\((.*?)\)/g, '<span class="c-red">$1</span>');
-            safeHtml = safeHtml.replace(/%2\((.*?)\)/g, '<span class="c-orange">$1</span>');
-            safeHtml = safeHtml.replace(/%3\((.*?)\)/g, '<span class="c-yellow">$1</span>');
-            safeHtml = safeHtml.replace(/%4\((.*?)\)/g, '<span class="c-green">$1</span>');
-            safeHtml = safeHtml.replace(/%5\((.*?)\)/g, '<span class="c-cyan">$1</span>');
-            safeHtml = safeHtml.replace(/%6\((.*?)\)/g, '<span class="c-blue">$1</span>');
-            safeHtml = safeHtml.replace(/%7\((.*?)\)/g, '<span class="c-indigo">$1</span>');
-            safeHtml = safeHtml.replace(/%8\((.*?)\)/g, '<span class="c-violet">$1</span>');
-            safeHtml = safeHtml.replace(/%9\((.*?)\)/g, '<span class="c-rainbow">$1</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%0(.*)$/gm, '$1<span class="c-gray">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%1(.*)$/gm, '$1<span class="c-red">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%2(.*)$/gm, '$1<span class="c-orange">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%3(.*)$/gm, '$1<span class="c-yellow">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%4(.*)$/gm, '$1<span class="c-green">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%5(.*)$/gm, '$1<span class="c-cyan">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%6(.*)$/gm, '$1<span class="c-blue">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%7(.*)$/gm, '$1<span class="c-indigo">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%8(.*)$/gm, '$1<span class="c-violet">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%9(.*)$/gm, '$1<span class="c-rainbow">$2</span>');
 
             safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
             safeHtml = safeHtml.replace(/^#\s*(.*?)$/gm, '<span class="mk-large">$1</span>');
@@ -480,13 +509,9 @@
             messageInput.focus();
         };
 
-        // Increment Clap action execution trigger handler
         window.executeClapAction = async function(timestamp, btnId) {
             const hasClapped = localStorage.getItem(`clapped_${timestamp}`);
-            if (hasClapped) {
-                alert("You've already clapped for this post.");
-                return;
-            }
+            if (hasClapped) return;
 
             try {
                 const response = await fetch(`${API_URL}/clap`, {
@@ -522,7 +547,7 @@
                 const data = await response.json();
                 
                 if (data.length === 0) {
-                    board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>Nothing yet. Post something, goy.</div>";
+                    board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>No entries yet.</div>";
                     document.getElementById('paginationControls').innerHTML = '';
                     return;
                 }
@@ -563,7 +588,7 @@
                 applyFiltersAndRender();
 
             } catch (err) {
-                board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>ERROR: heckin error in the mainframe...</div>";
+                board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>Failed to load message boards.</div>";
             }
         }
 
@@ -584,7 +609,7 @@
             board.innerHTML = '';
             
             if (filteredThreads.length === 0) {
-                board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>No matches found matching search queries.</div>";
+                board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>No matching boards found.</div>";
                 document.getElementById('paginationControls').innerHTML = '';
                 return;
             }
@@ -600,22 +625,19 @@
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'thread-group';
 
-                // Render Original Poster item box element
                 groupDiv.appendChild(createPostElement(thread, 'message-box'));
 
                 const totalReplies = thread.replies.length;
                 
                 if (totalReplies > 3 && !expandedThreadsSet.has(thread.postNum)) {
-                    // Render hidden tracking view window header interface banner
                     const hiddenCount = totalReplies - 3;
                     const banner = document.createElement('div');
                     banner.className = 'collapse-banner';
-                    banner.textContent = `[+] click to unfold ${hiddenCount} hidden reply entries`;
+                    banner.textContent = `[See ${hiddenCount} more replies...]`;
                     banner.setAttribute('onclick', `toggleThreadExpansion(${thread.postNum})`);
                     
                     groupDiv.appendChild(banner);
 
-                    // Show only the 3 most recent replies
                     const cutReplies = thread.replies.slice(-3);
                     cutReplies.forEach(reply => {
                         groupDiv.appendChild(createPostElement(reply, 'reply-box'));
@@ -624,7 +646,7 @@
                     if (totalReplies > 3) {
                         const banner = document.createElement('div');
                         banner.className = 'collapse-banner';
-                        banner.textContent = `[-] collapse thread view pipeline`;
+                        banner.textContent = `[Collapse replies]`;
                         banner.setAttribute('onclick', `toggleThreadExpansion(${thread.postNum})`);
                         groupDiv.appendChild(banner);
                     }
@@ -653,8 +675,10 @@
             const metaDiv = document.createElement('div');
             metaDiv.className = 'meta';
             
-            const metaText = document.createTextNode(`[${dateStr}] Anonymous: ${entry.username} `);
-            metaDiv.appendChild(metaText);
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'poster-name';
+            nameSpan.textContent = entry.username;
+            metaDiv.appendChild(nameSpan);
 
             if (entry.tripcode && entry.tripcode !== "None") {
                 const tripSpan = document.createElement('span');
@@ -663,9 +687,13 @@
                 metaDiv.appendChild(tripSpan);
             }
 
+            const timeSpan = document.createElement('span');
+            timeSpan.textContent = ` ${dateStr}`;
+            metaDiv.appendChild(timeSpan);
+
             const idLink = document.createElement('a');
             idLink.className = 'post-id-link';
-            idLink.textContent = ` No.${entry.postNum}`;
+            idLink.textContent = ` No. ${entry.postNum}`;
             idLink.setAttribute('onclick', `insertReplyTag(${entry.postNum})`);
             metaDiv.appendChild(idLink);
 
@@ -680,7 +708,7 @@
             const clapButton = document.createElement('button');
             clapButton.className = 'clap-btn';
             clapButton.id = btnId;
-            clapButton.textContent = `${entry.claps}`;
+            clapButton.textContent = `👏 ${entry.claps}`;
             clapButton.setAttribute('onclick', `executeClapAction('${entry.timestamp}', '${btnId}')`);
             footerDiv.appendChild(clapButton);
 
@@ -711,7 +739,7 @@
             container.appendChild(prevBtn);
 
             const statusSpan = document.createElement('span');
-            statusSpan.textContent = ` Page ${currentPage} / ${totalPages} `;
+            statusSpan.textContent = `[ ${currentPage} / ${totalPages} ]`;
             container.appendChild(statusSpan);
 
             const nextBtn = document.createElement('button');
@@ -729,20 +757,19 @@
             container.appendChild(lastBtn);
         }
 
-        // Rate limiting handler logic configuration block
         function executeRateLimitCountdown() {
             let countdown = 10;
             submitBtn.disabled = true;
-            submitBtn.textContent = `Cooldown. (${countdown}s)`;
+            submitBtn.textContent = `Cooldown (${countdown}s)`;
 
             const timer = setInterval(() => {
                 countdown--;
                 if (countdown <= 0) {
                     clearInterval(timer);
                     submitBtn.disabled = false;
-                    submitBtn.textContent = "Send Post.";
+                    submitBtn.textContent = "Submit";
                 } else {
-                    submitBtn.textContent = `Cooldown. (${countdown}s)`;
+                    submitBtn.textContent = `Cooldown (${countdown}s)`;
                 }
             }, 1000);
         }
@@ -765,17 +792,15 @@
                     executeRateLimitCountdown();
                     fetchMessages();
                 } else {
-                    alert("Transmission rejected.");
+                    alert("Submission blocked.");
                 }
             } catch (err) {
-                alert("Synchronization interrupted.");
+                alert("Network error.");
             }
         });
 
-        // Initialize board execution triggers
         fetchMessages();
 
-        // Background Auto Refresh: poll entries stack every 10 seconds silently
         setInterval(() => {
             fetchMessages();
         }, 10000);
