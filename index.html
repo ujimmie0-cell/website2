@@ -91,7 +91,6 @@
             padding-left: 18px; 
         }
 
-        /* Form Post Box Layout - Fixed Layout */
         .form-wrapper {
             display: flex;
             flex-direction: column;
@@ -213,6 +212,70 @@
             text-align: center;
         }
 
+        /* Admin Matrix Panel Console Style */
+        .admin-dashboard {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(106, 0, 5, 0.05);
+            border: 1px dashed #6a0005;
+            border-radius: var(--card-radius);
+            padding: 14px;
+        }
+        .admin-dashboard h4 {
+            color: #ff3333;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .admin-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .admin-row-inline {
+            display: flex;
+            gap: 6px;
+        }
+        .admin-dash-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 6px 10px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .admin-dash-btn:hover {
+            background: #6a0005;
+            border-color: #ff3333;
+        }
+        .admin-grid input {
+            background: #000000;
+            border: 1px solid var(--board-border);
+            color: #fff;
+            padding: 4px 8px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            flex: 1;
+        }
+        .log-output-pane {
+            background: #000000;
+            border: 1px solid var(--board-border);
+            font-size: 0.7rem;
+            padding: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            color: #aaaaaa;
+            margin-top: 6px;
+            display: none;
+        }
+
         /* Imageboard Traditional Thread Layout */
         .thread-group {
             display: flex;
@@ -268,7 +331,7 @@
         }
 
         .post-id-link {
-            color: #0029DE;
+            color: #190080;
             text-decoration: none;
             cursor: pointer;
             font-weight: bold;
@@ -283,7 +346,7 @@
         }
         
         .tripcode { 
-            color: #D10088; 
+            color: #6a0005; 
             font-weight: bold; 
         }
         
@@ -299,6 +362,8 @@
             display: flex;
             justify-content: flex-start;
             margin-top: 6px;
+            gap: 10px;
+            align-items: center;
         }
 
         .clap-btn {
@@ -311,9 +376,21 @@
             padding: 2px 4px;
             transition: color 0.1s;
         }
-
         .clap-btn:hover {
             color: #ffaa00;
+        }
+
+        .admin-inline-del-btn {
+            background: transparent;
+            border: none;
+            color: #ff3333;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.7rem;
+            display: none;
+        }
+        .admin-inline-del-btn:hover {
+            text-decoration: underline;
         }
 
         .collapse-banner {
@@ -328,7 +405,6 @@
             color: #ffaa00;
         }
 
-        /* Pagination Module UI - Muted White Links */
         .pagination-container {
             display: flex;
             justify-content: center;
@@ -359,7 +435,7 @@
             opacity: 0.3;
         }
 
-        /* --- Markup Style Configurations --- */
+        /* Markup Elements */
         .mk-large { font-size: 1.2rem; font-weight: bold; display: block; margin: 4px 0; color: #ffffff; }
         .mk-green { color: #789922; }
         .mk-orange { color: #ff8800; }
@@ -387,7 +463,7 @@
             background: transparent;
         }
 
-        /* Color Codes System Modifiers */
+        /* Custom Color Parsers */
         .c-gray { color: #888888; }
         .c-red { color: #ff3333; }
         .c-orange { color: #ff9933; }
@@ -410,7 +486,7 @@
     <div class="board-container">
 
         <div class="thread-prompt">
-            <div class="guestbook-header">guestbook</div>
+            <div class="guestbook-header">/guestbook/</div>
         </div>
 
         <div class="rules-card">
@@ -443,6 +519,24 @@
             </form>
         </div>
 
+        <div class="admin-dashboard" id="adminControlPanel">
+            <h4>System Admin Matrix</h4>
+            <div class="admin-grid">
+                <button class="admin-dash-btn" style="border-color: #6a0005;" onclick="adminWipeDatabase()">⚠️ Wipe Entire Board Database</button>
+                <div class="admin-row-inline">
+                    <input type="text" id="banTargetIp" placeholder="IP Address (e.g., 192.168.1.1)">
+                    <button class="admin-dash-btn" onclick="adminBanIP('add')">Ban IP</button>
+                    <button class="admin-dash-btn" onclick="adminBanIP('remove')">Unban</button>
+                </div>
+                <div class="admin-row-inline">
+                    <input type="text" id="purgeTargetTrip" placeholder="Target Tripcode String">
+                    <button class="admin-dash-btn" onclick="adminPurgeByTripcode()">Purge Tripcode Posts</button>
+                </div>
+                <button class="admin-dash-btn" onclick="adminFetchSystemLogs()">Fetch Moderation Audit Log</button>
+                <div class="log-output-pane" id="adminLogOutput"></div>
+            </div>
+        </div>
+
         <div class="search-box-wrap">
             <input type="text" id="boardSearch" placeholder="Search entries..." autocomplete="off">
         </div>
@@ -455,6 +549,7 @@
 
     <script>
         const API_URL = 'https://guestbook-api.32d23d2r435ged.workers.dev'; 
+        const ADMIN_SECRET = "Admin#8ae51278842014xff78954bcc30780498ec";
 
         const form = document.getElementById('guestbookForm');
         const board = document.getElementById('boardEntries');
@@ -469,6 +564,16 @@
         const threadsPerPage = 5;
         let searchQuery = "";
         let expandedThreadsSet = new Set(); 
+        let isAdminLoggedIn = false;
+
+        // Monitoring Name Field input values for Auth trigger matching
+        document.getElementById('username').addEventListener('input', (e) => {
+            if (e.target.value === ADMIN_SECRET) {
+                isAdminLoggedIn = true;
+                document.getElementById('adminControlPanel').style.display = 'block';
+                applyFiltersAndRender(); // Updates elements to project admin delete tools inline
+            }
+        });
 
         messageInput.addEventListener('input', () => {
             charCount.textContent = `${messageInput.value.length} / 700`;
@@ -518,6 +623,61 @@
             messageInput.value += `>>${num} `;
             messageInput.dispatchEvent(new Event('input'));
             messageInput.focus();
+        };
+
+        /* --- Frontend Administrative Request Pipelines --- */
+        window.adminWipeDatabase = async function() {
+            if (!confirm("Are you absolutely sure you want to completely erase the entire board history?")) return;
+            const res = await fetch(`${API_URL}/admin/wipe`, {
+                method: "POST", headers: { "X-Admin-Token": ADMIN_SECRET }
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
+
+        window.adminDeleteSinglePost = async function(timestamp) {
+            if (!confirm("Remove this target posting?")) return;
+            const res = await fetch(`${API_URL}/admin/delete-single`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
+                body: JSON.stringify({ timestamp })
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
+
+        window.adminBanIP = async function(actionType) {
+            const ipVal = document.getElementById('banTargetIp').value.trim();
+            if(!ipVal) return alert("Enter target IP address.");
+            const res = await fetch(`${API_URL}/admin/ban`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
+                body: JSON.stringify({ ipToBan: ipVal, action: actionType })
+            });
+            alert(await res.text());
+        };
+
+        window.adminPurgeByTripcode = async function() {
+            const tripVal = document.getElementById('purgeTargetTrip').value.trim();
+            if(!tripVal) return alert("Enter target tripcode string value.");
+            if(!confirm(`Purge all items submitted via tripcode ${tripVal}?`)) return;
+            const res = await fetch(`${API_URL}/admin/delete-by-tripcode`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
+                body: JSON.stringify({ targetTripcode: tripVal })
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
+
+        window.adminFetchSystemLogs = async function() {
+            const pane = document.getElementById('adminLogOutput');
+            const res = await fetch(`${API_URL}/admin/logs`, {
+                headers: { "X-Admin-Token": ADMIN_SECRET }
+            });
+            const data = await res.json();
+            pane.style.display = 'block';
+            pane.textContent = data.map(l => `[${l.timestamp}] IP:${l.ip} -> ${l.action}`).join('\n') || "No operations logged.";
         };
 
         window.executeClapAction = async function(timestamp, btnId) {
@@ -722,6 +882,14 @@
             clapButton.textContent = `▲ ${entry.claps}`;
             clapButton.setAttribute('onclick', `executeClapAction('${entry.timestamp}', '${btnId}')`);
             footerDiv.appendChild(clapButton);
+
+            // Appending quick inline deletion capabilities if current user triggered admin mode
+            const delButton = document.createElement('button');
+            delButton.className = 'admin-inline-del-btn';
+            delButton.textContent = "[Delete]";
+            delButton.setAttribute('onclick', `adminDeleteSinglePost('${entry.timestamp}')`);
+            if(isAdminLoggedIn) { delButton.style.display = 'inline-block'; }
+            footerDiv.appendChild(delButton);
 
             box.appendChild(metaDiv);
             box.appendChild(textDiv);
