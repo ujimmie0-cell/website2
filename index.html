@@ -593,13 +593,27 @@
         let expandedThreadsSet = new Set(); 
         let isAdminLoggedIn = false;
 
-        document.getElementById('username').addEventListener('input', (e) => {
-            if (e.target.value === ADMIN_SECRET) {
-                isAdminLoggedIn = true;
-                document.getElementById('adminControlPanel').style.display = 'block';
-                applyFiltersAndRender();
-            }
+document.getElementById('username').addEventListener('input', (e) => {
+    // Show the panel if the text starts with your admin password prefix
+    if (e.target.value.startsWith("Admin#")) {
+        isAdminLoggedIn = true;
+        document.getElementById('adminControlPanel').style.display = 'block';
+        
+        // Unhide inline admin features ([Delete] / [Pin]) on already rendered posts
+        document.querySelectorAll('.admin-inline-del-btn, .admin-inline-pin-btn').forEach(btn => {
+            btn.style.display = 'inline-block';
         });
+    } else {
+        // Optional: Hide it again if they clear the input box
+        if (e.target.value.trim() === "") {
+            isAdminLoggedIn = false;
+            document.getElementById('adminControlPanel').style.display = 'none';
+            document.querySelectorAll('.admin-inline-del-btn, .admin-inline-pin-btn').forEach(btn => {
+                btn.style.display = 'none';
+            });
+        }
+    }
+});
 
         messageInput.addEventListener('input', () => {
             charCount.textContent = `${messageInput.value.length} / 700`;
