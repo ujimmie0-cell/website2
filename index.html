@@ -212,23 +212,24 @@
             text-align: center;
         }
 
-        /* Admin Matrix Panel Console Style */
+        /* Minimal Traditional Admin Console */
         .admin-dashboard {
             display: none;
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            background: rgba(106, 0, 5, 0.05);
-            border: 1px dashed #6a0005;
+            background: transparent;
+            border: 1px solid var(--board-border);
             border-radius: var(--card-radius);
             padding: 14px;
         }
         .admin-dashboard h4 {
-            color: #ff3333;
+            color: var(--text-main);
             font-size: 0.85rem;
             text-align: center;
             margin-bottom: 10px;
             letter-spacing: 2px;
+            text-transform: uppercase;
         }
         .admin-grid {
             display: flex;
@@ -241,7 +242,7 @@
         }
         .admin-dash-btn {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--board-border);
             color: #ffffff;
             padding: 6px 10px;
             font-family: inherit;
@@ -250,8 +251,7 @@
             border-radius: 4px;
         }
         .admin-dash-btn:hover {
-            background: #6a0005;
-            border-color: #ff3333;
+            background: rgba(255, 255, 255, 0.1);
         }
         .admin-grid input {
             background: #000000;
@@ -268,7 +268,7 @@
             border: 1px solid var(--board-border);
             font-size: 0.7rem;
             padding: 8px;
-            max-height: 120px;
+            max-height: 140px;
             overflow-y: auto;
             white-space: pre-wrap;
             color: #aaaaaa;
@@ -276,7 +276,7 @@
             display: none;
         }
 
-        /* Imageboard Traditional Thread Layout */
+        /* Imageboard Threads UI */
         .thread-group {
             display: flex;
             flex-direction: column;
@@ -435,13 +435,14 @@
             opacity: 0.3;
         }
 
-        /* Markup Elements */
-        .mk-large { font-size: 1.2rem; font-weight: bold; display: block; margin: 4px 0; color: #ffffff; }
+        /* --- STYLED MARKDOWN STRUCTURAL PARSERS --- */
+        .mk-large { font-size: 1.3rem; font-weight: bold; display: block; margin: 4px 0; color: #ffffff; }
+        .mk-medium { font-size: 1.1rem; font-weight: bold; display: block; margin: 3px 0; color: #dddddd; }
         .mk-green { color: #789922; }
         .mk-orange { color: #ff8800; }
         .mk-bold { font-weight: bold; }
         .mk-italic { font-style: italic; }
-        .mk-strike { text-decoration: line-through; opacity: 0.5; }
+        .mk-strike { text-decoration: line-through; opacity: 0.6; }
         .mk-underline { text-decoration: underline; }
         .mk-glow {
             color: #000000 !important;
@@ -463,7 +464,7 @@
             background: transparent;
         }
 
-        /* Custom Color Parsers */
+        /* Custom Color Signatures */
         .c-gray { color: #888888; }
         .c-red { color: #ff3333; }
         .c-orange { color: #ff9933; }
@@ -486,7 +487,7 @@
     <div class="board-container">
 
         <div class="thread-prompt">
-            <div class="guestbook-header">/guestbook/</div>
+            <div class="guestbook-header">guestbook</div>
         </div>
 
         <div class="rules-card">
@@ -520,19 +521,20 @@
         </div>
 
         <div class="admin-dashboard" id="adminControlPanel">
-            <h4>System Admin Matrix</h4>
+            <h4>ADMIN PANEL</h4>
             <div class="admin-grid">
-                <button class="admin-dash-btn" style="border-color: #6a0005;" onclick="adminWipeDatabase()">⚠️ Wipe Entire Board Database</button>
+                <button class="admin-dash-btn" onclick="adminWipeDatabase()">Wipe Entire Board</button>
                 <div class="admin-row-inline">
-                    <input type="text" id="banTargetIp" placeholder="IP Address (e.g., 192.168.1.1)">
+                    <input type="text" id="banTargetIp" placeholder="IP Address">
                     <button class="admin-dash-btn" onclick="adminBanIP('add')">Ban IP</button>
-                    <button class="admin-dash-btn" onclick="adminBanIP('remove')">Unban</button>
+                    <button class="admin-dash-btn" onclick="adminBanIP('remove')">Unban IP</button>
                 </div>
                 <div class="admin-row-inline">
-                    <input type="text" id="purgeTargetTrip" placeholder="Target Tripcode String">
+                    <input type="text" id="purgeTargetTrip" placeholder="Tripcode (e.g. !aB1cD2eF)">
                     <button class="admin-dash-btn" onclick="adminPurgeByTripcode()">Purge Tripcode Posts</button>
+                    <button class="admin-dash-btn" onclick="adminInspectTripcode()">Inspect Tripcode</button>
                 </div>
-                <button class="admin-dash-btn" onclick="adminFetchSystemLogs()">Fetch Moderation Audit Log</button>
+                <button class="admin-dash-btn" onclick="adminFetchSystemLogs()">Fetch Audit Log</button>
                 <div class="log-output-pane" id="adminLogOutput"></div>
             </div>
         </div>
@@ -566,12 +568,11 @@
         let expandedThreadsSet = new Set(); 
         let isAdminLoggedIn = false;
 
-        // Monitoring Name Field input values for Auth trigger matching
         document.getElementById('username').addEventListener('input', (e) => {
             if (e.target.value === ADMIN_SECRET) {
                 isAdminLoggedIn = true;
                 document.getElementById('adminControlPanel').style.display = 'block';
-                applyFiltersAndRender(); // Updates elements to project admin delete tools inline
+                applyFiltersAndRender();
             }
         });
 
@@ -593,26 +594,33 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
 
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%0(.*)$/gm, '$1<span class="c-gray">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%1(.*)$/gm, '$1<span class="c-red">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%2(.*)$/gm, '$1<span class="c-orange">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%3(.*)$/gm, '$1<span class="c-yellow">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%4(.*)$/gm, '$1<span class="c-green">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%5(.*)$/gm, '$1<span class="c-cyan">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%6(.*)$/gm, '$1<span class="c-blue">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%7(.*)$/gm, '$1<span class="c-indigo">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%8(.*)$/gm, '$1<span class="c-violet">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%9(.*)$/gm, '$1<span class="c-rainbow">$2</span>');
+            // Custom Single-Line Color Parsers without requiring parenthesis
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%gray (.*)$/gm, '$1<span class="c-gray">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%red (.*)$/gm, '$1<span class="c-red">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%orange (.*)$/gm, '$1<span class="c-orange">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%yellow (.*)$/gm, '$1<span class="c-yellow">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%green (.*)$/gm, '$1<span class="c-green">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%cyan (.*)$/gm, '$1<span class="c-cyan">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%blue (.*)$/gm, '$1<span class="c-blue">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%indigo (.*)$/gm, '$1<span class="c-indigo">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%violet (.*)$/gm, '$1<span class="c-violet">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%rainbow (.*)$/gm, '$1<span class="c-rainbow">$2</span>');
 
-            safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
-            safeHtml = safeHtml.replace(/^#\s*(.*?)$/gm, '<span class="mk-large">$1</span>');
+            // Header Elements
+            safeHtml = safeHtml.replace(/^# (.*?)$/gm, '<span class="mk-large">$1</span>');
+            safeHtml = safeHtml.replace(/^## (.*?)$/gm, '<span class="mk-medium">$1</span>');
+
+            // Text Board Indicators
             safeHtml = safeHtml.replace(/^&gt;(.*?)$/gm, '<span class="mk-green">&gt;$1</span>');
             safeHtml = safeHtml.replace(/^&lt;(.*?)$/gm, '<span class="mk-orange">&lt;$1</span>');
+            safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
+            
+            // Text Modifiers
             safeHtml = safeHtml.replace(/\*\*(.*?)\*\*/g, '<span class="mk-bold">$1</span>');
             safeHtml = safeHtml.replace(/\*(.*?)\*/g, '<span class="mk-italic">$1</span>');
-            safeHtml = safeHtml.replace(/-(.*?)-/g, '<span class="mk-strike">$1</span>');
+            safeHtml = safeHtml.replace(/~(.*?)~/g, '<span class="mk-strike">$1</span>');
             safeHtml = safeHtml.replace(/_(.*?)_/g, '<span class="mk-underline">$1</span>');
-            safeHtml = safeHtml.replace(/%(.*?)%/g, '<span class="mk-glow">$1</span>');
+            safeHtml = safeHtml.replace(/\+(.*?)\+/g, '<span class="mk-glow">$1</span>');
             safeHtml = safeHtml.replace(/\(\(\((.*?)\)\)\)/g, '<span class="mk-blue-font">$1</span>');
             safeHtml = safeHtml.replace(/\|(.*?)\|/g, '<span class="mk-spoiler">$1</span>');
 
@@ -625,9 +633,8 @@
             messageInput.focus();
         };
 
-        /* --- Frontend Administrative Request Pipelines --- */
+        /* --- Admin Pipelines (Prompts Removed for Swift Modification) --- */
         window.adminWipeDatabase = async function() {
-            if (!confirm("Are you absolutely sure you want to completely erase the entire board history?")) return;
             const res = await fetch(`${API_URL}/admin/wipe`, {
                 method: "POST", headers: { "X-Admin-Token": ADMIN_SECRET }
             });
@@ -636,7 +643,6 @@
         };
 
         window.adminDeleteSinglePost = async function(timestamp) {
-            if (!confirm("Remove this target posting?")) return;
             const res = await fetch(`${API_URL}/admin/delete-single`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
@@ -648,7 +654,7 @@
 
         window.adminBanIP = async function(actionType) {
             const ipVal = document.getElementById('banTargetIp').value.trim();
-            if(!ipVal) return alert("Enter target IP address.");
+            if(!ipVal) return alert("Enter IP address.");
             const res = await fetch(`${API_URL}/admin/ban`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
@@ -659,8 +665,7 @@
 
         window.adminPurgeByTripcode = async function() {
             const tripVal = document.getElementById('purgeTargetTrip').value.trim();
-            if(!tripVal) return alert("Enter target tripcode string value.");
-            if(!confirm(`Purge all items submitted via tripcode ${tripVal}?`)) return;
+            if(!tripVal) return alert("Enter tripcode.");
             const res = await fetch(`${API_URL}/admin/delete-by-tripcode`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
@@ -668,6 +673,26 @@
             });
             alert(await res.text());
             fetchMessages();
+        };
+
+        window.adminInspectTripcode = async function() {
+            const tripVal = document.getElementById('purgeTargetTrip').value.trim();
+            if(!tripVal) return alert("Enter tripcode to inspect.");
+            const pane = document.getElementById('adminLogOutput');
+            
+            const res = await fetch(`${API_URL}/admin/inspect-tripcode`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": ADMIN_SECRET },
+                body: JSON.stringify({ targetTripcode: tripVal })
+            });
+            const data = await res.json();
+            
+            pane.style.display = 'block';
+            let ipReport = "";
+            for (const [ip, count] of Object.entries(data.associatedIps)) {
+                ipReport += `  - ${ip} (used in ${count} post(s))\n`;
+            }
+            pane.textContent = `INSPECT REPORT FOR ${data.tripcode}\nTotal Board Count: ${data.postCount} posts\nLinked IP Signatures:\n${ipReport || "  No active IPs recorded."}`;
         };
 
         window.adminFetchSystemLogs = async function() {
@@ -778,7 +803,6 @@
 
         function renderActivePageData() {
             board.innerHTML = '';
-            
             if (filteredThreads.length === 0) {
                 board.innerHTML = "<div style='text-align:center; opacity:0.3; font-size:0.9rem; padding: 40px;'>No matching boards found.</div>";
                 document.getElementById('paginationControls').innerHTML = '';
@@ -795,18 +819,15 @@
             pageThreads.forEach(thread => {
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'thread-group';
-
                 groupDiv.appendChild(createPostElement(thread, 'message-box'));
 
                 const totalReplies = thread.replies.length;
-                
                 if (totalReplies > 3 && !expandedThreadsSet.has(thread.postNum)) {
                     const hiddenCount = totalReplies - 3;
                     const banner = document.createElement('div');
                     banner.className = 'collapse-banner';
                     banner.textContent = `[See ${hiddenCount} more replies...]`;
                     banner.setAttribute('onclick', `toggleThreadExpansion(${thread.postNum})`);
-                    
                     groupDiv.appendChild(banner);
 
                     const cutReplies = thread.replies.slice(-3);
@@ -821,12 +842,10 @@
                         banner.setAttribute('onclick', `toggleThreadExpansion(${thread.postNum})`);
                         groupDiv.appendChild(banner);
                     }
-                    
                     thread.replies.forEach(reply => {
                         groupDiv.appendChild(createPostElement(reply, 'reply-box'));
                     });
                 }
-
                 board.appendChild(groupDiv);
             });
 
@@ -883,7 +902,6 @@
             clapButton.setAttribute('onclick', `executeClapAction('${entry.timestamp}', '${btnId}')`);
             footerDiv.appendChild(clapButton);
 
-            // Appending quick inline deletion capabilities if current user triggered admin mode
             const delButton = document.createElement('button');
             delButton.className = 'admin-inline-del-btn';
             delButton.textContent = "[Delete]";
@@ -900,7 +918,6 @@
         function renderPaginationControls(totalPages) {
             const container = document.getElementById('paginationControls');
             container.innerHTML = '';
-
             if (totalPages <= 1) return;
 
             const firstBtn = document.createElement('button');
@@ -979,10 +996,7 @@
         });
 
         fetchMessages();
-
-        setInterval(() => {
-            fetchMessages();
-        }, 10000);
+        setInterval(() => { fetchMessages(); }, 10000);
     </script>
 </body>
 </html>
