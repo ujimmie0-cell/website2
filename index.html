@@ -352,14 +352,11 @@
         }
 
         .pin-indicator {
-            color: #ffaa00;
-            font-size: 0.75rem;
+            color: #ffff33;
+            font-size: 0.8rem;
             font-weight: bold;
-            border: 1px solid rgba(255, 170, 0, 0.3);
-            padding: 0px 4px;
-            border-radius: 3px;
-            text-transform: uppercase;
             letter-spacing: 1px;
+            margin-right: 4px;
         }
         
         .text-content { 
@@ -951,7 +948,7 @@
             if (isOpPost && entry.pinned) {
                 const pinBadge = document.createElement('span');
                 pinBadge.className = 'pin-indicator';
-                pinBadge.textContent = 'Pinned';
+                pinBadge.textContent = '[PINNED]';
                 metaDiv.appendChild(pinBadge);
             }
             
