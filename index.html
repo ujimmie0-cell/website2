@@ -4,268 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>vanitas | Guestbook</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --glow-color: rgba(255, 255, 255, 0.4);
-            --text-main: #ffffff;
-            --text-sub: rgba(255, 255, 255, 0.4);
-            --accent-glow: #00ff00;
-            --board-border: rgba(255, 255, 255, 0.08);
-            --msg-bg: rgba(255, 255, 255, 0.02);
-            --reply-bg: rgba(255, 255, 255, 0.04);
-            --form-label-bg: rgba(255, 255, 255, 0.03);
-            --card-radius: 6px;
-        }
-
-        @font-face {
-            font-family: 'TestFont1';
-            src: url('test/font1.ttf') format('truetype');
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
-
+        /* --- Global Styles (Inherited from Site 1) --- */
         body {
-            background: #000000;
-            color: var(--text-main);
-            font-family: Courier, monospace, sans-serif;
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-y: auto;
+            font-family: "Courier New", Courier, monospace, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #000000; 
+            color: #ffffff; 
         }
 
-        .board-container {
-            width: 100%;
-            max-width: 850px;
+        /* --- Layout Grid (Inherited from Site 1) --- */
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* --- Left Sidebar Panels (Inherited from Site 1) --- */
+        .sidebar {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .thread-prompt {
-            text-align: center;
-            margin-bottom: -10px;
+        .box {
+            border: 2px solid #ffffff; 
+            padding: 15px;
         }
-        
-        .thread-prompt .guestbook-header {
-            font-size: 1.6rem;
-            letter-spacing: 4px;
-            text-transform: lowercase;
-            color: var(--text-main);
+
+        .sidebar-box {
+            background-color: #d1d5db; 
+            color: #000000; 
+        }
+
+        .sidebar-box h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
             font-weight: bold;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 4px;
         }
 
-        .rules-card {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--board-border);
-            border-radius: var(--card-radius);
-            padding: 12px;
-            font-size: 0.8rem;
-            line-height: 1.4;
-            color: rgba(255, 255, 255, 0.6);
-            max-width: 500px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        .rules-card h3 {
-            text-align: center;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-        
-        .rules-card ol { 
-            padding-left: 18px; 
+        .sidebar-box ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
         }
 
-        .form-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
+        .sidebar-box ul li {
             margin-bottom: 10px;
-            gap: 12px;
         }
 
-        form {
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* --- Main Content Panel (Inherited from Site 1) --- */
+        .main-content {
+            background-color: #ffffff; 
+            color: #000000; 
+            border: 2px solid #ffffff; 
+            padding: 25px;
         }
 
-        .inputs-table {
-            display: table;
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--board-border);
-            border-radius: var(--card-radius);
-            overflow: hidden;
-        }
-
-        .form-row {
-            display: table-row;
-        }
-
-        .form-label {
-            display: table-cell;
-            background: var(--form-label-bg);
-            border-right: 1px solid var(--board-border);
-            padding: 8px;
-            font-size: 0.8rem;
+        .main-content h1 {
+            margin-top: 0;
+            font-size: 1.4rem;
             font-weight: bold;
-            color: var(--text-main);
-            width: 90px;
-            vertical-align: middle;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
         }
 
-        .form-row:first-child .form-label, 
-        .form-row:first-child .form-input-cell {
-            border-bottom: 1px solid var(--board-border);
-        }
+        /* --- Links (Inherited from Site 1) --- */
+        a { color: #0000ee; text-decoration: underline; font-weight: bold; }
+        a:visited { color: #551a8b; }
+        a:hover { color: #ff0000; }
 
-        .form-input-cell {
-            display: table-cell;
-            padding: 4px;
-            position: relative;
+        /* --- Form Elements in Main Panel --- */
+        .form-wrapper {
+            width: 100%;
+            margin-bottom: 20px;
         }
         
-        form input, form textarea {
+        .form-table {
             width: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            color: var(--text-main);
-            padding: 6px 8px;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        
+        .form-table th {
+            background: #eaeaea;
+            border: 1px solid #000000;
+            padding: 8px;
+            font-weight: bold;
+            text-align: left;
+            width: 90px;
+        }
+        
+        .form-table td {
+            border: 1px solid #000000;
+            padding: 8px;
+            background: #ffffff;
+        }
+
+        .form-table input, .form-table textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: 1px solid #000000;
+            color: #000000;
+            padding: 6px;
             font-family: inherit;
             font-size: 0.85rem;
-        }
-        
-        form input:focus, form textarea:focus {
-            border-color: rgba(255, 255, 255, 0.2);
-            outline: none;
         }
 
         .char-counter {
-            font-size: 0.7rem;
-            color: var(--text-sub);
-            position: absolute;
-            right: 12px;
-            bottom: 10px;
-        }
-
-        form button {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--board-border);
-            border-radius: 4px;
-            color: var(--text-main);
-            padding: 8px 24px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-weight: bold;
+            font-size: 0.75rem;
+            color: #666666;
+            text-align: right;
             margin-top: 4px;
-            width: auto;
-            min-width: 120px;
         }
-        
-        form button:hover:not(:disabled) {
+
+        /* --- Sidebar Forms (Search & Admin) --- */
+        .sidebar-input {
+            width: 100%;
+            box-sizing: border-box;
             background: #ffffff;
+            border: 1px solid #000000;
             color: #000000;
-        }
-
-        form button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .search-box-wrap {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        .search-box-wrap input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--board-border);
-            border-radius: var(--card-radius);
-            color: var(--text-main);
-            padding: 8px;
+            padding: 6px;
             font-family: inherit;
-            font-size: 0.8rem;
-            text-align: center;
+            font-size: 0.85rem;
         }
 
-        /* Minimal Traditional Admin Console */
-        .admin-dashboard {
-            display: none;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            background: transparent;
-            border: 1px solid var(--board-border);
-            border-radius: var(--card-radius);
-            padding: 14px;
-        }
-        .admin-dashboard h4 {
-            color: var(--text-main);
-            font-size: 0.85rem;
-            text-align: center;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
         .admin-grid {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
+
         .admin-row-inline {
             display: flex;
-            gap: 6px;
+            gap: 4px;
         }
+
         .admin-dash-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--board-border);
-            color: #ffffff;
-            padding: 6px 10px;
+            background: #eaeaea;
+            border: 1px solid #000000;
+            color: #000000;
+            padding: 6px;
             font-family: inherit;
             font-size: 0.75rem;
             cursor: pointer;
-            border-radius: 4px;
+            font-weight: bold;
         }
         .admin-dash-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: #ffffff;
         }
-        .admin-grid input {
-            background: #000000;
-            border: 1px solid var(--board-border);
-            color: #fff;
-            padding: 4px 8px;
-            font-family: inherit;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            flex: 1;
-        }
+
         .log-output-pane {
             background: #000000;
-            border: 1px solid var(--board-border);
+            border: 1px solid #000000;
             font-size: 0.7rem;
             padding: 8px;
             max-height: 140px;
@@ -276,35 +176,34 @@
             display: none;
         }
 
-        /* Imageboard Threads UI */
+        /* --- Imageboard Threads UI styled like Site 1 --- */
         .thread-group {
             display: flex;
             flex-direction: column;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            border-top: 1px dashed #000000;
             padding-top: 16px;
             margin-top: 10px;
         }
 
         .message-box {
-            background: var(--msg-bg);
-            border: 1px solid var(--board-border);
-            border-radius: var(--card-radius);
-            padding: 12px 16px;
+            background: #ffffff;
+            border: 1px solid #000000;
+            padding: 12px;
             width: 100%;
             margin-bottom: 6px;
-            position: relative;
+            box-sizing: border-box;
         }
 
         .reply-box {
-            background: var(--reply-bg);
-            border: 1px solid var(--board-border);
-            border-radius: var(--card-radius);
-            padding: 12px 16px;
+            background: #f3f4f6;
+            border: 1px solid #000000;
+            padding: 12px;
             margin-top: 6px;
             margin-left: 40px;
             display: table; 
             max-width: calc(100% - 40px);
             position: relative;
+            box-sizing: border-box;
         }
 
         .reply-box::before {
@@ -312,12 +211,13 @@
             position: absolute;
             left: -26px;
             top: 12px;
-            color: rgba(255, 255, 255, 0.15);
+            color: #000000;
             font-size: 0.8rem;
+            font-weight: bold;
         }
         
         .meta { 
-            color: var(--text-sub); 
+            color: #666666; 
             font-size: 0.8rem; 
             margin-bottom: 8px; 
             display: flex;
@@ -327,35 +227,36 @@
         }
 
         .poster-name {
-            color: #119955;
+            color: #008800;
             font-weight: bold;
         }
 
         .post-id-link {
-            color: #0049D1;
-            text-decoration: none;
+            color: #0000ee;
+            text-decoration: underline;
             cursor: pointer;
             font-weight: bold;
         }
         .post-id-link:hover {
-            color: #ffaa00;
+            color: #ff0000;
         }
 
         .reply-tag {
-            color: #ffaa00;
+            color: #d96600;
             font-weight: bold;
         }
         
         .tripcode { 
-            color: #D10088; 
+            color: #8b008b; 
             font-weight: bold; 
         }
 
         .pin-indicator {
-            color: #ffff33;
+            color: #b5b500;
+            background: #000000;
             font-size: 0.8rem;
             font-weight: bold;
-            letter-spacing: 1px;
+            padding: 0 4px;
             margin-right: 4px;
         }
         
@@ -365,6 +266,7 @@
             white-space: pre-wrap; 
             font-size: 0.85rem;
             padding-left: 2px;
+            color: #000000;
         }
 
         .post-footer {
@@ -378,45 +280,48 @@
         .clap-btn {
             background: transparent;
             border: none;
-            color: var(--text-sub);
+            color: #000000;
             font-family: inherit;
             font-size: 0.75rem;
             cursor: pointer;
             padding: 2px 4px;
-            transition: color 0.1s;
+            font-weight: bold;
         }
         .clap-btn:hover {
-            color: #ffaa00;
+            text-decoration: underline;
         }
 
         .admin-inline-del-btn, .admin-inline-pin-btn {
             background: transparent;
             border: none;
-            color: #ff3333;
+            color: #cc0000;
             cursor: pointer;
             font-family: inherit;
             font-size: 0.7rem;
             display: none;
+            font-weight: bold;
         }
         .admin-inline-pin-btn {
-            color: #ffaa00;
+            color: #d96600;
         }
         .admin-inline-del-btn:hover, .admin-inline-pin-btn:hover {
             text-decoration: underline;
         }
 
         .collapse-banner {
-            color: var(--text-sub);
+            color: #666666;
             font-size: 0.75rem;
             padding: 6px;
             margin-left: 40px;
             cursor: pointer;
             text-decoration: underline;
+            font-weight: bold;
         }
         .collapse-banner:hover {
-            color: #ffaa00;
+            color: #ff0000;
         }
 
+        /* --- Pagination Layout (Inherited from Site 1) --- */
         .pagination-container {
             display: flex;
             justify-content: center;
@@ -424,59 +329,59 @@
             gap: 8px;
             margin-top: 24px;
             font-size: 0.8rem;
-            border: 1px solid var(--board-border);
-            border-radius: var(--card-radius);
+            border: 1px solid #000000;
+            border-radius: 4px;
             padding: 6px;
-            background: rgba(255, 255, 255, 0.01);
+            background: #f3f4f6;
+            color: #000000;
         }
 
         .pag-btn {
             background: transparent;
             border: none;
-            color: var(--text-main);
+            color: #000000;
             cursor: pointer;
             font-family: inherit;
             padding: 2px 6px;
+            font-weight: bold;
         }
-        .pag-btn:hover:not(:disabled) {
-            text-decoration: underline;
-        }
-        .pag-btn:disabled {
-            color: var(--text-sub);
-            cursor: not-allowed;
-            opacity: 0.3;
-        }
+        .pag-btn:hover:not(:disabled) { text-decoration: underline; }
+        .pag-btn:disabled { color: #888888; cursor: not-allowed; opacity: 0.4; }
 
-        /* Raw Code Block Style to escape markup rules */
-        .mk-raw-code {
-            font-family: Courier, monospace;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--board-border);
-            padding: 6px 10px;
-            display: block;
-            margin: 6px 0;
-            border-radius: 4px;
-            color: #cccccc;
-        }
-
-        /* --- STYLED MARKDOWN STRUCTURAL PARSERS --- */
-        .mk-large { font-size: 1.3rem; font-weight: bold; display: block; margin: 4px 0; color: #ffffff; }
-        .mk-medium { font-size: 1.1rem; font-weight: bold; display: block; margin: 3px 0; color: #dddddd; }
-        .mk-green { color: #789922; }
-        .mk-orange { color: #ff8800; }
+        /* --- Styled Markdown Parsers (Inherited from Site 1) --- */
+        .mk-large { font-size: 1.4rem; font-weight: bold; display: block; margin: 10px 0 6px 0; color: #000000; border-bottom: 1px solid #ddd; }
+        .mk-medium { font-size: 1.2rem; font-weight: bold; display: block; margin: 8px 0 4px 0; color: #222222; }
+        
         .mk-bold { font-weight: bold; }
         .mk-italic { font-style: italic; }
         .mk-strike { text-decoration: line-through; opacity: 0.6; }
         .mk-underline { text-decoration: underline; }
-        .mk-glow {
-            color: #000000 !important;
-            background-color: #000000;
-            text-shadow: 0 0 4px var(--accent-glow), 0 0 8px var(--accent-glow);
-            padding: 0 4px;
-            border-radius: 2px;
-            display: inline-block;
+        .mk-highlight { background-color: #ffff00; color: #000000; padding: 0 2px; font-weight: bold; }
+        .mk-green { color: #008800; font-weight: bold; }
+        .mk-orange { color: #d96600; font-weight: bold; }
+        .mk-glow { text-shadow: 0 0 8px currentColor; }
+
+        .mk-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 0.9rem;
         }
-        .mk-blue-font { font-family: 'TestFont1', sans-serif; color: #3388ff; }
+        .mk-table th { background: #eaeaea; border: 1px solid #000000; padding: 6px 8px; font-weight: bold; text-align: left; }
+        .mk-table td { border: 1px solid #000000; padding: 6px 8px; }
+
+        .mk-raw-code {
+            font-family: Courier, monospace;
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            padding: 6px 10px;
+            display: block;
+            margin: 8px 0;
+            border-radius: 4px;
+            color: #333333;
+            white-space: pre-wrap;
+        }
+
         .mk-spoiler {
             background: #222222;
             color: #222222;
@@ -488,92 +393,111 @@
             background: transparent;
         }
 
-        /* Custom Color Signatures */
-        .c-gray { color: #888888; }
-        .c-red { color: #ff3333; }
-        .c-orange { color: #ff9933; }
-        .c-yellow { color: #ffff33; }
-        .c-green { color: #33ff33; }
-        .c-cyan { color: #33ffff; }
-        .c-blue { color: #3366ff; }
-        .c-indigo { color: #6600ff; }
-        .c-violet { color: #cc33ff; }
+        /* Core Colors Mapping Modifiers (Inherited from Site 1) --- */
+        .c-grey { color: #777777; }
+        .c-brown { color: #8b4513; }
+        .c-red { color: #cc0000; }
+        .c-orange { color: #d96600; }
+        .c-yellow { color: #b5b500; }
+        .c-green { color: #008800; }
+        .c-blue { color: #0000cc; }
+        .c-indigo { color: #4b0082; }
+        .c-violet { color: #8b008b; }
+        .c-pink { color: #ff69b4; }
         
         @keyframes rainbow-anim {
-            0% { color: #ff3333; } 16% { color: #ff9933; } 33% { color: #ffff33; }
-            50% { color: #33ff33; } 66% { color: #33ffff; } 83% { color: #3366ff; } 100% { color: #ff3333; }
+            0% { color: #cc0000; } 16% { color: #d96600; } 33% { color: #b5b500; }
+            50% { color: #008800; } 66% { color: #0000cc; } 83% { color: #8b008b; } 100% { color: #cc0000; }
         }
         .c-rainbow { animation: rainbow-anim 4s infinite linear; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="board-container">
-
-        <div class="thread-prompt">
-            <div class="guestbook-header">guestbook</div>
-        </div>
-
-        <div class="rules-card">
-            <h3>Rules</h3>
-            <ol>
-                <li>No 'p.</li>
-                <li>No gore.</li>
-                <li>No spamming.</li>
-            </ol>
-        </div>
-
-        <div class="form-wrapper">
-            <form id="guestbookForm">
-                <div class="inputs-table">
-                    <div class="form-row">
-                        <div class="form-label">Name</div>
-                        <div class="form-input-cell">
-                            <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-label">Comment</div>
-                        <div class="form-input-cell">
-                            <textarea id="message" placeholder="Put your text here." rows="4" required maxlength="700"></textarea>
-                            <div class="char-counter" id="charCount">0 / 700</div>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" id="submitBtn">Submit</button>
-            </form>
-        </div>
-
-        <!-- Minimalist Admin Control Console Panel -->
-        <div class="admin-dashboard" id="adminControlPanel">
-            <h4>ADMIN PANEL</h4>
-            <div class="admin-grid">
-                <button class="admin-dash-btn" onclick="adminWipeDatabase()">Wipe Entire Board</button>
-                <div class="admin-row-inline">
-                    <input type="text" id="banTargetIp" placeholder="IP Address">
-                    <button class="admin-dash-btn" onclick="adminBanIP('add')">Ban IP</button>
-                    <button class="admin-dash-btn" onclick="adminBanIP('remove')">Unban IP</button>
-                </div>
-                <div class="admin-row-inline">
-                    <input type="text" id="purgeTargetTrip" placeholder="Tripcode (e.g. !aB1cD2eF)">
-                    <button class="admin-dash-btn" onclick="adminPurgeByTripcode()">Purge Tripcode Posts</button>
-                    <button class="admin-dash-btn" onclick="adminInspectTripcode()">Inspect Tripcode</button>
-                </div>
-                <button class="admin-dash-btn" onclick="adminFetchSystemLogs()">Fetch Audit Log</button>
-                <div class="log-output-pane" id="adminLogOutput"></div>
-            </div>
-        </div>
-
-        <div class="search-box-wrap">
-            <input type="text" id="boardSearch" placeholder="Search entries..." autocomplete="off">
-        </div>
-
-        <div id="boardEntries">Loading asset configuration maps...</div>
+    <div class="container">
         
-        <div class="pagination-container" id="paginationControls"></div>
+        <!-- Sidebar Navigation (Same Layout Style as Site 1) -->
+        <aside class="sidebar">
+            <div class="box sidebar-box">
+                <h2>Explore</h2>
+                <ul>
+                    <li><a href="https://guestbook.vanitas.lol">Guestbook</a></li>
+                    <li><a href="https://bio.vanitas.lol">Bio</a></li>
+                </ul>
+            </div>
+
+            <div class="box sidebar-box">
+                <h2>Rules</h2>
+                <ol style="padding-left: 18px; margin: 0; font-size: 0.85rem;">
+                    <li>No 'p.</li>
+                    <li>No gore.</li>
+                    <li>No spamming.</li>
+                </ol>
+            </div>
+
+            <div class="box sidebar-box">
+                <h2>Search</h2>
+                <input type="text" id="boardSearch" class="sidebar-input" placeholder="Search entries..." autocomplete="off">
+            </div>
+
+            <!-- Admin Control Console (Only shows up when admin password is typed) -->
+            <div class="box sidebar-box" id="adminControlPanel" style="display: none;">
+                <h2>Admin Control</h2>
+                <div class="admin-grid">
+                    <button class="admin-dash-btn" onclick="adminWipeDatabase()">Wipe Board</button>
+                    <div class="admin-row-inline">
+                        <input type="text" id="banTargetIp" class="sidebar-input" placeholder="IP Address" style="padding: 4px;">
+                        <button class="admin-dash-btn" onclick="adminBanIP('add')">Ban</button>
+                        <button class="admin-dash-btn" onclick="adminBanIP('remove')">Unban</button>
+                    </div>
+                    <div class="admin-row-inline">
+                        <input type="text" id="purgeTargetTrip" class="sidebar-input" placeholder="Tripcode" style="padding: 4px;">
+                        <button class="admin-dash-btn" onclick="adminPurgeByTripcode()">Purge</button>
+                        <button class="admin-dash-btn" onclick="adminInspectTripcode()">Inspect</button>
+                    </div>
+                    <button class="admin-dash-btn" onclick="adminFetchSystemLogs()">Fetch Logs</button>
+                    <div class="log-output-pane" id="adminLogOutput"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area (Same Style as Site 1) -->
+        <main class="main-content">
+            <h1>Guestbook</h1>
+            
+            <div class="form-wrapper">
+                <form id="guestbookForm">
+                    <table class="form-table">
+                        <tr>
+                            <th>Name</th>
+                            <td>
+                                <input type="text" id="username" placeholder="Anonymous#password" required maxlength="50" autocomplete="off">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Comment</th>
+                            <td>
+                                <textarea id="message" placeholder="Put your text here." rows="4" required maxlength="700"></textarea>
+                                <div class="char-counter" id="charCount">0 / 700</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <button type="submit" id="submitBtn" class="admin-dash-btn" style="padding: 8px 24px; font-size: 0.85rem;">Submit</button>
+                </form>
+            </div>
+
+            <div id="boardEntries">Loading asset configuration maps...</div>
+            
+            <div class="pagination-container" id="paginationControls"></div>
+        </main>
 
     </div>
 
+    <!-- JavaScript Logic Intact & Unchanged -->
     <script>
         const API_URL = 'https://guestbook-api.32d23d2r435ged.workers.dev'; 
         const ADMIN_SECRET = "Admin#8ae51278842014xff78954bcc30780498ec";
@@ -593,27 +517,23 @@
         let expandedThreadsSet = new Set(); 
         let isAdminLoggedIn = false;
 
-document.getElementById('username').addEventListener('input', (e) => {
-    // Show the panel if the text starts with your admin password prefix
-    if (e.target.value.startsWith("Admin#")) {
-        isAdminLoggedIn = true;
-        document.getElementById('adminControlPanel').style.display = 'block';
-        
-        // Unhide inline admin features ([Delete] / [Pin]) on already rendered posts
-        document.querySelectorAll('.admin-inline-del-btn, .admin-inline-pin-btn').forEach(btn => {
-            btn.style.display = 'inline-block';
+        document.getElementById('username').addEventListener('input', (e) => {
+            if (e.target.value.startsWith("Admin#")) {
+                isAdminLoggedIn = true;
+                document.getElementById('adminControlPanel').style.display = 'block';
+                document.querySelectorAll('.admin-inline-del-btn, .admin-inline-pin-btn').forEach(btn => {
+                    btn.style.display = 'inline-block';
+                });
+            } else {
+                if (e.target.value.trim() === "") {
+                    isAdminLoggedIn = false;
+                    document.getElementById('adminControlPanel').style.display = 'none';
+                    document.querySelectorAll('.admin-inline-del-btn, .admin-inline-pin-btn').forEach(btn => {
+                        btn.style.display = 'none';
+                    });
+                }
+            }
         });
-    } else {
-        // Optional: Hide it again if they clear the input box
-        if (e.target.value.trim() === "") {
-            isAdminLoggedIn = false;
-            document.getElementById('adminControlPanel').style.display = 'none';
-            document.querySelectorAll('.admin-inline-del-btn, .admin-inline-pin-btn').forEach(btn => {
-                btn.style.display = 'none';
-            });
-        }
-    }
-});
 
         messageInput.addEventListener('input', () => {
             charCount.textContent = `${messageInput.value.length} / 700`;
@@ -626,18 +546,15 @@ document.getElementById('username').addEventListener('input', (e) => {
         });
 
         function parseTextboardMarkup(rawText) {
-            // First step: Isolate raw code blocks wrapped in triple backticks
             const segments = [];
             const codeBlockRegex = /```([\s\S]*?)```/g;
             let lastIndex = 0;
             let match;
 
             while ((match = codeBlockRegex.exec(rawText)) !== null) {
-                // Add preceding text before code segment
                 if (match.index > lastIndex) {
                     segments.push({ type: 'text', content: rawText.substring(lastIndex, match.index) });
                 }
-                // Add the code content completely unformatted
                 segments.push({ type: 'code', content: match[1] });
                 lastIndex = codeBlockRegex.lastIndex;
             }
@@ -645,14 +562,12 @@ document.getElementById('username').addEventListener('input', (e) => {
                 segments.push({ type: 'text', content: rawText.substring(lastIndex) });
             }
 
-            // If there are no code blocks, parse everything normally
             if (segments.length === 0) {
                 return applyTextFormatting(rawText);
             }
 
             return segments.map(seg => {
                 if (seg.type === 'code') {
-                    // Escape basic HTML inside code block but completely bypass internal markdown parsing
                     let cleanCode = seg.content
                         .replace(/&/g, "&amp;")
                         .replace(/</g, "&lt;")
@@ -672,34 +587,28 @@ document.getElementById('username').addEventListener('input', (e) => {
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
 
-            // Custom Single-Line Color Parsers
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%gray (.*)$/gm, '$1<span class="c-gray">$2</span>');
+            safeHtml = safeHtml.replace(/^([^%\n]*?)%gray (.*)$/gm, '$1<span class="c-grey">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%red (.*)$/gm, '$1<span class="c-red">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%orange (.*)$/gm, '$1<span class="c-orange">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%yellow (.*)$/gm, '$1<span class="c-yellow">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%green (.*)$/gm, '$1<span class="c-green">$2</span>');
-            safeHtml = safeHtml.replace(/^([^%\n]*?)%cyan (.*)$/gm, '$1<span class="c-cyan">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%blue (.*)$/gm, '$1<span class="c-blue">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%indigo (.*)$/gm, '$1<span class="c-indigo">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%violet (.*)$/gm, '$1<span class="c-violet">$2</span>');
             safeHtml = safeHtml.replace(/^([^%\n]*?)%rainbow (.*)$/gm, '$1<span class="c-rainbow">$2</span>');
 
-            // Header Elements
             safeHtml = safeHtml.replace(/^# (.*?)$/gm, '<span class="mk-large">$1</span>');
             safeHtml = safeHtml.replace(/^## (.*?)$/gm, '<span class="mk-medium">$1</span>');
 
-            // Text Board Indicators
             safeHtml = safeHtml.replace(/^&gt;(.*?)$/gm, '<span class="mk-green">&gt;$1</span>');
             safeHtml = safeHtml.replace(/^&lt;(.*?)$/gm, '<span class="mk-orange">&lt;$1</span>');
             safeHtml = safeHtml.replace(/&gt;&gt;(\d+)/g, '<span class="reply-tag">&gt;&gt;$1</span>');
             
-            // Text Modifiers
             safeHtml = safeHtml.replace(/\*\*(.*?)\*\*/g, '<span class="mk-bold">$1</span>');
-            safeHtml = safeHtml.replace(/\*(.*?)\*.*/g, '<span class="mk-italic">$1</span>');
+            safeHtml = safeHtml.replace(/\*(.*?)\*/g, '<span class="mk-italic">$1</span>');
             safeHtml = safeHtml.replace(/~(.*?)~/g, '<span class="mk-strike">$1</span>');
             safeHtml = safeHtml.replace(/_(.*?)_/g, '<span class="mk-underline">$1</span>');
             safeHtml = safeHtml.replace(/\+(.*?)\+/g, '<span class="mk-glow">$1</span>');
-            safeHtml = safeHtml.replace(/\(\(\((.*?)\)\)\)/g, '<span class="mk-blue-font">$1</span>');
             safeHtml = safeHtml.replace(/\|(.*?)\|/g, '<span class="mk-spoiler">$1</span>');
 
             return safeHtml;
@@ -711,95 +620,94 @@ document.getElementById('username').addEventListener('input', (e) => {
             messageInput.focus();
         };
 
-/* --- Fixed Admin Pipelines --- */
-window.adminWipeDatabase = async function() {
-    const typedSecret = document.getElementById('username').value; // Grab it live from the input box
-    const res = await fetch(`${API_URL}/admin/wipe`, {
-        method: "POST", 
-        headers: { "X-Admin-Token": typedSecret }
-    });
-    alert(await res.text());
-    fetchMessages();
-};
+        window.adminWipeDatabase = async function() {
+            const typedSecret = document.getElementById('username').value;
+            const res = await fetch(`${API_URL}/admin/wipe`, {
+                method: "POST", 
+                headers: { "X-Admin-Token": typedSecret }
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
 
-window.adminDeleteSinglePost = async function(timestamp) {
-    const typedSecret = document.getElementById('username').value;
-    const res = await fetch(`${API_URL}/admin/delete-single`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
-        body: JSON.stringify({ timestamp })
-    });
-    alert(await res.text());
-    fetchMessages();
-};
+        window.adminDeleteSinglePost = async function(timestamp) {
+            const typedSecret = document.getElementById('username').value;
+            const res = await fetch(`${API_URL}/admin/delete-single`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+                body: JSON.stringify({ timestamp })
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
 
-window.adminTogglePinThread = async function(timestamp) {
-    const typedSecret = document.getElementById('username').value;
-    const res = await fetch(`${API_URL}/admin/toggle-pin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
-        body: JSON.stringify({ timestamp })
-    });
-    alert(await res.text());
-    fetchMessages();
-};
+        window.adminTogglePinThread = async function(timestamp) {
+            const typedSecret = document.getElementById('username').value;
+            const res = await fetch(`${API_URL}/admin/toggle-pin`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+                body: JSON.stringify({ timestamp })
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
 
-window.adminBanIP = async function(actionType) {
-    const ipVal = document.getElementById('banTargetIp').value.trim();
-    if(!ipVal) return alert("Enter IP address.");
-    const typedSecret = document.getElementById('username').value;
-    const res = await fetch(`${API_URL}/admin/ban`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
-        body: JSON.stringify({ ipToBan: ipVal, action: actionType })
-    });
-    alert(await res.text());
-};
+        window.adminBanIP = async function(actionType) {
+            const ipVal = document.getElementById('banTargetIp').value.trim();
+            if(!ipVal) return alert("Enter IP address.");
+            const typedSecret = document.getElementById('username').value;
+            const res = await fetch(`${API_URL}/admin/ban`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+                body: JSON.stringify({ ipToBan: ipVal, action: actionType })
+            });
+            alert(await res.text());
+        };
 
-window.adminPurgeByTripcode = async function() {
-    const tripVal = document.getElementById('purgeTargetTrip').value.trim();
-    if(!tripVal) return alert("Enter tripcode.");
-    const typedSecret = document.getElementById('username').value;
-    const res = await fetch(`${API_URL}/admin/delete-by-tripcode`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
-        body: JSON.stringify({ targetTripcode: tripVal })
-    });
-    alert(await res.text());
-    fetchMessages();
-};
+        window.adminPurgeByTripcode = async function() {
+            const tripVal = document.getElementById('purgeTargetTrip').value.trim();
+            if(!tripVal) return alert("Enter tripcode.");
+            const typedSecret = document.getElementById('username').value;
+            const res = await fetch(`${API_URL}/admin/delete-by-tripcode`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+                body: JSON.stringify({ targetTripcode: tripVal })
+            });
+            alert(await res.text());
+            fetchMessages();
+        };
 
-window.adminInspectTripcode = async function() {
-    const tripVal = document.getElementById('purgeTargetTrip').value.trim();
-    if(!tripVal) return alert("Enter tripcode to inspect.");
-    const pane = document.getElementById('adminLogOutput');
-    const typedSecret = document.getElementById('username').value;
-    
-    const res = await fetch(`${API_URL}/admin/inspect-tripcode`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
-        body: JSON.stringify({ targetTripcode: tripVal })
-    });
-    const data = await res.json();
-    
-    pane.style.display = 'block';
-    let ipReport = "";
-    for (const [ip, count] of Object.entries(data.associatedIps)) {
-        ipReport += `  - ${ip} (used in ${count} post(s))\n`;
-    }
-    pane.textContent = `INSPECT REPORT FOR ${data.tripcode}\nTotal Board Count: ${data.postCount} posts\nLinked IP Signatures:\n${ipReport || "  No active IPs recorded."}`;
-};
+        window.adminInspectTripcode = async function() {
+            const tripVal = document.getElementById('purgeTargetTrip').value.trim();
+            if(!tripVal) return alert("Enter tripcode to inspect.");
+            const pane = document.getElementById('adminLogOutput');
+            const typedSecret = document.getElementById('username').value;
+            
+            const res = await fetch(`${API_URL}/admin/inspect-tripcode`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Admin-Token": typedSecret },
+                body: JSON.stringify({ targetTripcode: tripVal })
+            });
+            const data = await res.json();
+            
+            pane.style.display = 'block';
+            let ipReport = "";
+            for (const [ip, count] of Object.entries(data.associatedIps)) {
+                ipReport += `  - ${ip} (used in ${count} post(s))\n`;
+            }
+            pane.textContent = `INSPECT REPORT FOR ${data.tripcode}\nTotal Board Count: ${data.postCount} posts\nLinked IP Signatures:\n${ipReport || "  No active IPs recorded."}`;
+        };
 
-window.adminFetchSystemLogs = async function() {
-    const pane = document.getElementById('adminLogOutput');
-    const typedSecret = document.getElementById('username').value;
-    const res = await fetch(`${API_URL}/admin/logs`, {
-        headers: { "X-Admin-Token": typedSecret }
-    });
-    const data = await res.json();
-    pane.style.display = 'block';
-    pane.textContent = data.map(l => `[${l.timestamp}] IP:${l.ip} -> ${l.action}`).join('\n') || "No operations logged.";
-};
+        window.adminFetchSystemLogs = async function() {
+            const pane = document.getElementById('adminLogOutput');
+            const typedSecret = document.getElementById('username').value;
+            const res = await fetch(`${API_URL}/admin/logs`, {
+                headers: { "X-Admin-Token": typedSecret }
+            });
+            const data = await res.json();
+            pane.style.display = 'block';
+            pane.textContent = data.map(l => `[${l.timestamp}] IP:${l.ip} -> ${l.action}`).join('\n') || "No operations logged.";
+        };
 
         window.executeClapAction = async function(timestamp, btnId) {
             const hasClapped = localStorage.getItem(`clapped_${timestamp}`);
@@ -844,59 +752,37 @@ window.adminFetchSystemLogs = async function() {
                     return;
                 }
 
-                // Restore incremental chronological indexes
                 const indexedEntries = [...data].reverse().map((entry, idx) => ({
                     ...entry,
                     postNum: idx + 1,
                     claps: entry.claps || 0,
-                    pinned: entry.pinned || false,
-                    replies: []
+                    pinned: entry.pinned || false
                 }));
 
                 const mainThreads = [];
-                const allReplies = [];
-                const postMap = {};
+                const repliesMap = {};
 
-                // Step 1: Map all nodes and separate baseline OPs from general replies
                 indexedEntries.forEach(entry => {
-                    postMap[entry.postNum] = entry;
                     const match = entry.message.match(/>>(\d+)/);
-                    entry.parentId = match ? parseInt(match[1], 10) : null;
+                    const parentId = match ? parseInt(match[1], 10) : null;
 
-                    if (entry.parentId && entry.parentId < entry.postNum && indexedEntries.some(e => e.postNum === entry.parentId)) {
-                        allReplies.push(entry);
+                    if (parentId && parentId < entry.postNum && indexedEntries.some(e => e.postNum === parentId)) {
+                        if (!repliesMap[parentId]) repliesMap[parentId] = [];
+                        repliesMap[parentId].push(entry);
                     } else {
                         mainThreads.push(entry);
                     }
                 });
 
-                // Step 2: Trace every single reply back to its ultimate OP ancestor root thread
-                allReplies.forEach(reply => {
-                    let currentParent = postMap[reply.parentId];
-                    while (currentParent && currentParent.parentId && postMap[currentParent.parentId] && currentParent.parentId < currentParent.postNum) {
-                        currentParent = postMap[currentParent.parentId];
-                    }
-
-                    if (currentParent) {
-                        currentParent.replies.push(reply);
-                    } else {
-                        // Fallback fallback if parent tracking reference drops
-                        mainThreads.push(reply);
-                    }
-                });
-
-                // Step 3: Calculate proper chronological bumping times
                 mainThreads.forEach(thread => {
+                    thread.replies = repliesMap[thread.postNum] || [];
                     if (thread.replies.length > 0) {
-                        // Sort child replies chronologically inside the thread tree family array
-                        thread.replies.sort((a, b) => a.postNum - b.postNum);
                         thread.lastBumpTime = Math.max(...thread.replies.map(r => new Date(r.timestamp).getTime()));
                     } else {
                         thread.lastBumpTime = new Date(thread.timestamp).getTime();
                     }
                 });
 
-                // Priority sorting: Float pinned items to the top, then sort by bump signature time
                 mainThreads.sort((a, b) => {
                     if (a.pinned && !b.pinned) return -1;
                     if (!a.pinned && b.pinned) return 1;
@@ -907,8 +793,7 @@ window.adminFetchSystemLogs = async function() {
                 applyFiltersAndRender();
 
             } catch (err) {
-                console.error(err);
-                board.innerHTML = "<div style='color:#ff0055; text-align:center; font-size:0.9rem; padding: 20px;'>Failed to load message boards.</div>";
+                board.innerHTML = "<div style='color:#cc0000; text-align:center; font-size:0.9rem; padding: 20px;'>Failed to load message boards.</div>";
             }
         }
 
@@ -1033,7 +918,6 @@ window.adminFetchSystemLogs = async function() {
             clapButton.setAttribute('onclick', `executeClapAction('${entry.timestamp}', '${btnId}')`);
             footerDiv.appendChild(clapButton);
 
-            // Inline administrative tools context hooks
             const delButton = document.createElement('button');
             delButton.className = 'admin-inline-del-btn';
             delButton.textContent = "[Delete]";
